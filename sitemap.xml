@@ -1,0 +1,123 @@
+<?xml-stylesheet type="text/xsl" href="http://blog.vv80.top/sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>http://blog.vv80.top/about/</loc>
+    <lastmod>2017-08-28T21:41:52+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/categories/</loc>
+    <lastmod>2020-12-23T22:02:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/categories/error/</loc>
+    <lastmod>2020-12-23T22:02:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/tags/git/</loc>
+    <lastmod>2020-12-23T22:02:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/tags/hexo/</loc>
+    <lastmod>2020-12-23T22:02:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/post/hexo%E9%83%A8%E7%BD%B2%E5%91%BD%E4%BB%A4hexo-d%E5%91%BD%E4%BB%A4%E6%8A%A5%E9%94%99-error-deployer-not-found-git/</loc>
+    <lastmod>2020-12-23T22:02:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/post/</loc>
+    <lastmod>2020-12-23T22:02:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/tags/</loc>
+    <lastmod>2020-12-23T22:02:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/</loc>
+    <lastmod>2020-12-23T22:02:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/tags/conda/</loc>
+    <lastmod>2020-12-23T22:00:14+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/categories/config/</loc>
+    <lastmod>2020-12-23T22:00:14+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/tags/python/</loc>
+    <lastmod>2020-12-23T22:00:14+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/categories/python/</loc>
+    <lastmod>2020-12-23T22:00:14+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/post/%E8%A7%A3%E5%86%B3win10-powershell%E6%97%A0%E6%B3%95%E6%BF%80%E6%B4%BBanaconda%E7%8E%AF%E5%A2%83%E7%9A%84%E9%97%AE%E9%A2%98/</loc>
+    <lastmod>2020-12-23T22:00:14+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/tags/javascript/</loc>
+    <lastmod>2020-03-28T19:52:04+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/tags/npm/</loc>
+    <lastmod>2020-03-28T19:52:04+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.vv80.top/post/%E5%AE%89%E8%A3%85%E5%8C%85%E6%9D%83%E9%99%90%E9%94%99%E8%AF%AF-usr-lib-node-modules/</loc>
+    <lastmod>2020-03-28T19:52:04+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+</urlset>

@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: http://blog.vv80.top/sitemap.xml

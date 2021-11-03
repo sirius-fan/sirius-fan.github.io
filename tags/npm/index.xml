@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>npm on Xavier の Blog</title>
+    <link>http://blog.vv80.top/tags/npm/</link>
+    <description>Recent content in npm on Xavier の Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 28 Mar 2020 19:52:04 +0000</lastBuildDate><atom:link href="http://blog.vv80.top/tags/npm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>npm 安装包权限错误 /usr/lib/node_modules</title>
+      <link>http://blog.vv80.top/post/%E5%AE%89%E8%A3%85%E5%8C%85%E6%9D%83%E9%99%90%E9%94%99%E8%AF%AF-usr-lib-node-modules/</link>
+      <pubDate>Sat, 28 Mar 2020 19:52:04 +0000</pubDate>
+      
+      <guid>http://blog.vv80.top/post/%E5%AE%89%E8%A3%85%E5%8C%85%E6%9D%83%E9%99%90%E9%94%99%E8%AF%AF-usr-lib-node-modules/</guid>
+      <description>&lt;!-- #### npm 安装包权限错误 permission denied --&gt;
+&lt;p&gt;当你使用 npm global 安装npm包时候，例如&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;npm install -g handlebar &lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;这时就有可能发生错误&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[Error: EACCES: permission denied, access ‘/usr/lib/node_modules’]&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这是因为普通用户没有/usr 目录下的写入权限。当然你可以使用sudo，但是这并不是一个好方法。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

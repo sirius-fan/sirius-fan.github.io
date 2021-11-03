@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Xavier の Blog</title>
+    <link>http://blog.vv80.top/post/</link>
+    <description>Recent content in Posts on Xavier の Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Wed, 23 Dec 2020 22:02:00 +0000</lastBuildDate><atom:link href="http://blog.vv80.top/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>hexo部署命令hexo d命令报错 ERROR Deployer not found： git</title>
+      <link>http://blog.vv80.top/post/hexo%E9%83%A8%E7%BD%B2%E5%91%BD%E4%BB%A4hexo-d%E5%91%BD%E4%BB%A4%E6%8A%A5%E9%94%99-error-deployer-not-found-git/</link>
+      <pubDate>Wed, 23 Dec 2020 22:02:00 +0000</pubDate>
+      
+      <guid>http://blog.vv80.top/post/hexo%E9%83%A8%E7%BD%B2%E5%91%BD%E4%BB%A4hexo-d%E5%91%BD%E4%BB%A4%E6%8A%A5%E9%94%99-error-deployer-not-found-git/</guid>
+      <description>hexo 部署到GitHub page 时报错 1 2 3 ❯ hexo d INFO Validating config ERROR Deployer not found: git 解决方法：在站点目录下执行 1 npm install hexo-deployer-git --save 不在站点目录下执行有可能会不起作用。</description>
+    </item>
+    
+    <item>
+      <title>解决Win10 PowerShell无法激活Anaconda环境的问题</title>
+      <link>http://blog.vv80.top/post/%E8%A7%A3%E5%86%B3win10-powershell%E6%97%A0%E6%B3%95%E6%BF%80%E6%B4%BBanaconda%E7%8E%AF%E5%A2%83%E7%9A%84%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Wed, 23 Dec 2020 22:00:14 +0000</pubDate>
+      
+      <guid>http://blog.vv80.top/post/%E8%A7%A3%E5%86%B3win10-powershell%E6%97%A0%E6%B3%95%E6%BF%80%E6%B4%BBanaconda%E7%8E%AF%E5%A2%83%E7%9A%84%E9%97%AE%E9%A2%98/</guid>
+      <description>&lt;!-- # [解决Win10 PowerShell无法激活Anaconda环境的问题](https://www.cnblogs.com/dereen/p/ps_conda_env.html) --&gt;
+&lt;p&gt;最近在使用Anaconda的过程中，发现在Win10的PowerShell在使用&lt;code&gt;conda activate 环境名&lt;/code&gt;激活环境时无效，而CMD则可以。这里前提&lt;strong&gt;必须将Anaconda 写入环境变量&lt;/strong&gt;。否则在PowerShell 输入conda 的任何命令都会无法识别。&lt;/p&gt;
+&lt;p&gt;首先在终端输入&lt;code&gt;conda --version&lt;/code&gt;查看自己的anaconda版本。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>npm 安装包权限错误 /usr/lib/node_modules</title>
+      <link>http://blog.vv80.top/post/%E5%AE%89%E8%A3%85%E5%8C%85%E6%9D%83%E9%99%90%E9%94%99%E8%AF%AF-usr-lib-node-modules/</link>
+      <pubDate>Sat, 28 Mar 2020 19:52:04 +0000</pubDate>
+      
+      <guid>http://blog.vv80.top/post/%E5%AE%89%E8%A3%85%E5%8C%85%E6%9D%83%E9%99%90%E9%94%99%E8%AF%AF-usr-lib-node-modules/</guid>
+      <description>&lt;!-- #### npm 安装包权限错误 permission denied --&gt;
+&lt;p&gt;当你使用 npm global 安装npm包时候，例如&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;npm install -g handlebar &lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;这时就有可能发生错误&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[Error: EACCES: permission denied, access ‘/usr/lib/node_modules’]&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这是因为普通用户没有/usr 目录下的写入权限。当然你可以使用sudo，但是这并不是一个好方法。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

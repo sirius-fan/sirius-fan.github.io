@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Xavier の Blog</title>
+    <link>http://blog.vv80.top/tags/</link>
+    <description>Recent content in Tags on Xavier の Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Wed, 23 Dec 2020 22:02:00 +0000</lastBuildDate><atom:link href="http://blog.vv80.top/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>git</title>
+      <link>http://blog.vv80.top/tags/git/</link>
+      <pubDate>Wed, 23 Dec 2020 22:02:00 +0000</pubDate>
+      
+      <guid>http://blog.vv80.top/tags/git/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>hexo</title>
+      <link>http://blog.vv80.top/tags/hexo/</link>
+      <pubDate>Wed, 23 Dec 2020 22:02:00 +0000</pubDate>
+      
+      <guid>http://blog.vv80.top/tags/hexo/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>conda</title>
+      <link>http://blog.vv80.top/tags/conda/</link>
+      <pubDate>Wed, 23 Dec 2020 22:00:14 +0000</pubDate>
+      
+      <guid>http://blog.vv80.top/tags/conda/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>python</title>
+      <link>http://blog.vv80.top/tags/python/</link>
+      <pubDate>Wed, 23 Dec 2020 22:00:14 +0000</pubDate>
+      
+      <guid>http://blog.vv80.top/tags/python/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>javascript</title>
+      <link>http://blog.vv80.top/tags/javascript/</link>
+      <pubDate>Sat, 28 Mar 2020 19:52:04 +0000</pubDate>
+      
+      <guid>http://blog.vv80.top/tags/javascript/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>npm</title>
+      <link>http://blog.vv80.top/tags/npm/</link>
+      <pubDate>Sat, 28 Mar 2020 19:52:04 +0000</pubDate>
+      
+      <guid>http://blog.vv80.top/tags/npm/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
