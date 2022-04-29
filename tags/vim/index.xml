@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>vim on Xavier の Blog</title>
+    <link>http://blog.vv80.top/tags/vim/</link>
+    <description>Recent content in vim on Xavier の Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 29 Apr 2022 19:23:51 +0800</lastBuildDate><atom:link href="http://blog.vv80.top/tags/vim/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>vim的diff模式</title>
+      <link>http://blog.vv80.top/post/vim%E7%9A%84diff%E6%A8%A1%E5%BC%8F/</link>
+      <pubDate>Fri, 29 Apr 2022 19:23:51 +0800</pubDate>
+      
+      <guid>http://blog.vv80.top/post/vim%E7%9A%84diff%E6%A8%A1%E5%BC%8F/</guid>
+      <description>直接在终端使用比较模式打开两个文件： vim -d file1 file2 或 vimdiff file1 file2 如果已经打开了文件file1，再打开另一个文件file2进行比较： :vert diffsplit file2 如果没有用ver</description>
+    </item>
+    
+  </channel>
+</rss>

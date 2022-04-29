@@ -6,7 +6,25 @@
     <description>Recent content in Tags on Xavier の Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 23 Dec 2020 22:02:00 +0000</lastBuildDate><atom:link href="http://blog.vv80.top/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 29 Apr 2022 21:03:58 +0800</lastBuildDate><atom:link href="http://blog.vv80.top/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Linux</title>
+      <link>http://blog.vv80.top/tags/linux/</link>
+      <pubDate>Fri, 29 Apr 2022 21:03:58 +0800</pubDate>
+      
+      <guid>http://blog.vv80.top/tags/linux/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>vim</title>
+      <link>http://blog.vv80.top/tags/vim/</link>
+      <pubDate>Fri, 29 Apr 2022 19:23:51 +0800</pubDate>
+      
+      <guid>http://blog.vv80.top/tags/vim/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>git</title>
       <link>http://blog.vv80.top/tags/git/</link>

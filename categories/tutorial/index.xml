@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>tutorial on Xavier の Blog</title>
+    <link>http://blog.vv80.top/categories/tutorial/</link>
+    <description>Recent content in tutorial on Xavier の Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 29 Apr 2022 21:03:58 +0800</lastBuildDate><atom:link href="http://blog.vv80.top/categories/tutorial/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>shell脚本去除Windows换行符</title>
+      <link>http://blog.vv80.top/post/shell%E8%84%9A%E6%9C%AC%E5%8E%BB%E9%99%A4windows%E6%8D%A2%E8%A1%8C%E7%AC%A6/</link>
+      <pubDate>Fri, 29 Apr 2022 21:03:58 +0800</pubDate>
+      
+      <guid>http://blog.vv80.top/post/shell%E8%84%9A%E6%9C%AC%E5%8E%BB%E9%99%A4windows%E6%8D%A2%E8%A1%8C%E7%AC%A6/</guid>
+      <description>TLDR: ^M现象 使用命令更改换行符 1 sed -i -e &amp;#39;s/\r$//&amp;#39; ${File_name} 解释和其他办法 文件格式互转命令（额外安装） 1.unix2dos：将具有unix风格的格式文件转化为具</description>
+    </item>
+    
+    <item>
+      <title>vim的diff模式</title>
+      <link>http://blog.vv80.top/post/vim%E7%9A%84diff%E6%A8%A1%E5%BC%8F/</link>
+      <pubDate>Fri, 29 Apr 2022 19:23:51 +0800</pubDate>
+      
+      <guid>http://blog.vv80.top/post/vim%E7%9A%84diff%E6%A8%A1%E5%BC%8F/</guid>
+      <description>直接在终端使用比较模式打开两个文件： vim -d file1 file2 或 vimdiff file1 file2 如果已经打开了文件file1，再打开另一个文件file2进行比较： :vert diffsplit file2 如果没有用ver</description>
+    </item>
+    
+  </channel>
+</rss>

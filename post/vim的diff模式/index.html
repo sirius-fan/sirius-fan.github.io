@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>vim的diff模式 - Xavier の Blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Xavier" /><meta name="description" content="直接在终端使用比较模式打开两个文件： vim -d file1 file2 或 vimdiff file1 file2 如果已经打开了文件file1，再打开另一个文件file2进行比较： :vert diffsplit file2 如果没有用ver" /><meta name="keywords" content="Hugo, theme" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.98.0 with theme even" />
+
+
+<link rel="canonical" href="http://blog.vv80.top/post/vim%E7%9A%84diff%E6%A8%A1%E5%BC%8F/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="vim的diff模式" />
+<meta property="og:description" content="直接在终端使用比较模式打开两个文件： vim -d file1 file2 或 vimdiff file1 file2 如果已经打开了文件file1，再打开另一个文件file2进行比较： :vert diffsplit file2 如果没有用ver" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.vv80.top/post/vim%E7%9A%84diff%E6%A8%A1%E5%BC%8F/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-04-29T19:23:51+08:00" />
+<meta property="article:modified_time" content="2022-04-29T19:23:51+08:00" />
+
+<meta itemprop="name" content="vim的diff模式">
+<meta itemprop="description" content="直接在终端使用比较模式打开两个文件： vim -d file1 file2 或 vimdiff file1 file2 如果已经打开了文件file1，再打开另一个文件file2进行比较： :vert diffsplit file2 如果没有用ver"><meta itemprop="datePublished" content="2022-04-29T19:23:51+08:00" />
+<meta itemprop="dateModified" content="2022-04-29T19:23:51+08:00" />
+<meta itemprop="wordCount" content="912">
+<meta itemprop="keywords" content="vim," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="vim的diff模式"/>
+<meta name="twitter:description" content="直接在终端使用比较模式打开两个文件： vim -d file1 file2 或 vimdiff file1 file2 如果已经打开了文件file1，再打开另一个文件file2进行比较： :vert diffsplit file2 如果没有用ver"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">胡言</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">胡言</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">vim的diff模式</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2022-04-29 </span>
+        <div class="post-category">
+            <a href="/categories/tutorial/"> tutorial </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#参考">参考</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <!-- # vim的diff模式 -->
+<ol>
+<li>
+<p>直接在终端使用比较模式打开两个文件：</p>
+<blockquote>
+<p>vim -d file1 file2 或 vimdiff file1 file2</p>
+</blockquote>
+</li>
+<li>
+<p>如果已经打开了文件file1，再打开另一个文件file2进行比较：</p>
+<blockquote>
+<p>:vert diffsplit file2</p>
+</blockquote>
+<p>如果没有用vert命令，diffsplit则会分上下两个窗口。</p>
+</li>
+<li>
+<p>如果已经用split方式打开了两个文件file1，file2，又想比较两文件的不同。<br>
+例如使用<code>Ctrl+w v</code> 分窗口后打开另一个文件；或者</p>
+<blockquote>
+<p>vim -O file1 [file2 &hellip;]</p>
+</blockquote>
+<p><strong>分别在所有要比较的窗口</strong>里面输入命令：</p>
+<blockquote>
+<p>:diffthis</p>
+</blockquote>
+<p>或者直接比较所有打开的窗口</p>
+<blockquote>
+<p>:windo diffthis
+另
+:windo difft (short for diffthis) will start diff mode in all the open windows.</p>
+</blockquote>
+</li>
+<li>
+<p>如果更改了某个窗口的内容，vim又没有自动更新diff检查，可以使用如下命令更新：</p>
+<blockquote>
+<p>:diffupdate</p>
+</blockquote>
+</li>
+<li>
+<p>定位到不同点：<br>
+<code>[c</code>   跳到前一个不同点<br>
+<code>]c</code>   跳到后一个不同点</p>
+</li>
+<li>
+<p>处理差异：<br>
+<code>:diffput</code>  或者 <code>dp</code>   将差异点的当前文档内容应用到另一文档<br>
+<code>:diffget</code>  或者 <code>do</code>   将差异点的另一文档的内容拷贝到当前文档</p>
+</li>
+<li>
+<p>关闭diff</p>
+<p><code>:diffoff!</code> (The <code>!</code> makes <code>diffoff</code> apply to all windows of the current tab - it&rsquo;d be nice if <code>diffthis</code> had the same feature, but it doesn&rsquo;t.)</p>
+<p><code>:windo diffo</code> (short for diffoff) will stop diff mode in all the open windows.</p>
+<p>所以这两条命令等效 <code>:windo diffo or :diffo!</code></p>
+</li>
+<li>
+<p>在窗口间跳转：
+ctrl-w w  跳到下一个窗口
+ctrl-w h  跳到左侧窗口
+ctrl-w l  跳到右侧窗口
+ctrl-w j  跳到下方的窗口
+ctrl-w k  跳到上方的窗口</p>
+</li>
+<li>
+<p>上下文的展开和查看
+比较和合并文件的时候经常需要结合上下文来确定最终要采取的操作。Vimdiff 缺省是会把不同之处上下各 6 行的文本都显示出来以供参考。其他的相同的文本行被自动折叠。如果希望修改缺省的上下文行数为3行，可以这样设置：</p>
+<blockquote>
+<p>:set diffopt=context:3</p>
+</blockquote>
+<p>可以用简单的折叠命令来临时展开被折叠的相同的文本行：
+<code>zo</code>     (folding open, z这个字母看上去比较像折叠的纸）</p>
+<p>然后可以用下列命令来重新折叠：
+<code>zc</code>     (folding close)</p>
+</li>
+<li>
+<p>比较二进制文件<br>
+<code>vim -bd 1.bin 2.bin</code><br>
+<code>:%!xxd -g 1</code>,这样就ok了，对于二进制文件的比较和打开，必须明确指出-b参数，否则，二进制数据显示出现错误！
+可以使用如下键盘映射：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">nmap &lt;C-F7&gt; :%!xxd -g 1&lt;CR&gt;
+</span></span><span class="line"><span class="cl">nmap &lt;S-F7&gt; :%!xxd -r&lt;CR&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>:diffget从对面的窗口获取不同之处到当前窗体</p>
+<p>:diffput将当前窗口的不同之处复制到对面窗体</p>
+<p>do等同diffget diff obtain</p>
+<p>dp等同diffput</p>
+</li>
+<li>
+<p>编辑二进制文件</p>
+<p><code>vim -b filename</code> 打开二进制文件</p>
+<p><code>:%!xxd</code> 转化成16进制查看</p>
+<p><code>:%!xxd -r</code> 修改后将16进制转到二进制</p>
+<p>:wq 存盘退出</p>
+</li>
+</ol>
+<h2 id="参考">参考</h2>
+<ul>
+<li>
+<p>[1] <a href="https://stackoverflow.com/questions/4385515/take-diff-of-two-vertical-opened-windows-in-vim">Take diff of two vertical opened windows in Vim - Stack Overflow</a></p>
+</li>
+<li>
+<p>[2] <a href="https://linuxhint.com/diff-two-files-vim/">Vim Diff Two Files (linuxhint.com)</a></p>
+</li>
+<li>
+<p>[3] <a href="https://blog.csdn.net/lianghongge/article/details/50859290">(15条消息) vim 比较文件、修改二进制文件_lianghongge的博客-CSDN博客</a></p>
+</li>
+<li>
+<p>[4] <a href="https://www.iteye.com/blog/jandroid-1204994">vim 比较文件、修改二进制文件 - jandroid - ITeye博客</a></p>
+</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">Xavier</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2022-04-29
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/vim/">vim</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/shell%E8%84%9A%E6%9C%AC%E5%8E%BB%E9%99%A4windows%E6%8D%A2%E8%A1%8C%E7%AC%A6/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">shell脚本去除Windows换行符</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/hexo%E9%83%A8%E7%BD%B2%E5%91%BD%E4%BB%A4hexo-d%E5%91%BD%E4%BB%A4%E6%8A%A5%E9%94%99-error-deployer-not-found-git/">
+            <span class="next-text nav-default">hexo部署命令hexo d命令报错 ERROR Deployer not found： git</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="fanjl123456789@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/sirius-fan" class="iconfont icon-github" title="github"></a>
+      <a href="https://space.bilibili.com/298735688" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://blog.vv80.top/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2020 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>Xavier</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
