@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>wsl on Xavier の Blog</title>
+    <link>http://blog.vv80.top/categories/wsl/</link>
+    <description>Recent content in wsl on Xavier の Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 30 Apr 2022 19:58:35 +0800</lastBuildDate><atom:link href="http://blog.vv80.top/categories/wsl/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>资源管理器访问wsl目录</title>
+      <link>http://blog.vv80.top/post/%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E5%99%A8%E8%AE%BF%E9%97%AEwsl%E7%9B%AE%E5%BD%95/</link>
+      <pubDate>Sat, 30 Apr 2022 19:58:35 +0800</pubDate>
+      
+      <guid>http://blog.vv80.top/post/%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E5%99%A8%E8%AE%BF%E9%97%AEwsl%E7%9B%AE%E5%BD%95/</guid>
+      <description>在文件资源管理器输入\\wsl$ 如果让wsl继承Windows path，可在终端运行 explorer.exe .</description>
+    </item>
+    
+  </channel>
+</rss>

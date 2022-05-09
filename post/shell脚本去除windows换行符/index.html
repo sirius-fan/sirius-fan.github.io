@@ -49,7 +49,7 @@
 <meta itemprop="name" content="shell脚本去除Windows换行符">
 <meta itemprop="description" content="TLDR: ^M现象 使用命令更改换行符 1 sed -i -e &#39;s/\r$//&#39; ${File_name} 解释和其他办法 文件格式互转命令（额外安装） 1.unix2dos：将具有unix风格的格式文件转化为具"><meta itemprop="datePublished" content="2022-04-29T21:03:58+08:00" />
 <meta itemprop="dateModified" content="2022-04-29T21:03:58+08:00" />
-<meta itemprop="wordCount" content="1883">
+<meta itemprop="wordCount" content="1887">
 <meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="shell脚本去除Windows换行符"/>
 <meta name="twitter:description" content="TLDR: ^M现象 使用命令更改换行符 1 sed -i -e &#39;s/\r$//&#39; ${File_name} 解释和其他办法 文件格式互转命令（额外安装） 1.unix2dos：将具有unix风格的格式文件转化为具"/>
@@ -144,10 +144,13 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#解释和其他办法">解释和其他办法</a></li>
+        <li><a href="#解释和其他办法">解释和其他办法</a>
+          <ul>
+            <li><a href="#linuxwindows-和-mac-中的换行符对比httpswwwcnblogscomcnjavahomep8893813html"><a href="https://www.cnblogs.com/cnjavahome/p/8893813.html">Linux、Windows 和 Mac 中的换行符对比</a></a></li>
+          </ul>
+        </li>
       </ul>
     </li>
-    <li><a href="#linuxwindows-和-mac-中的换行符对比httpswwwcnblogscomcnjavahomep8893813html"><a href="https://www.cnblogs.com/cnjavahome/p/8893813.html">Linux、Windows 和 Mac 中的换行符对比</a></a></li>
   </ul>
 </nav>
   </div>
@@ -168,7 +171,7 @@
 <p>文件格式互转命令（额外安装）</p>
 <p>1.unix2dos：将具有unix风格的格式文件转化为具有window下的格式文件。</p>
 <p>2.dos2unix：将具有windows风格的格式文件转化为unix下的格式文件。</p>
-<h1 id="linuxwindows-和-mac-中的换行符对比httpswwwcnblogscomcnjavahomep8893813html"><a href="https://www.cnblogs.com/cnjavahome/p/8893813.html">Linux、Windows 和 Mac 中的换行符对比</a></h1>
+<h3 id="linuxwindows-和-mac-中的换行符对比httpswwwcnblogscomcnjavahomep8893813html"><a href="https://www.cnblogs.com/cnjavahome/p/8893813.html">Linux、Windows 和 Mac 中的换行符对比</a></h3>
 <p>原文地址：<a href="http://www.moonxy.com/wordpress/319.html">Linux、Windows 和 Mac 中的换行符对比</a></p>
 <p>博客地址：<a href="http://www.moonxy.com/">http://www.moonxy.com</a></p>
 <p><strong>一、前言</strong></p>
@@ -186,17 +189,17 @@
 <p>LF 使用 &ldquo;\n&quot;符号表示，ASCII代码是 10，十六制为 <strong>0x0A</strong>。所以 Windows 平台上换行在文本文件中是使用 &ldquo;<strong>0D0A</strong>&rdquo; 两个字节表示，而 UNIX/Linux 和苹果平台上换行则分别是使用 <strong>0A</strong> 和 <strong>0D</strong> 一个字节表示。</p>
 <p>由于 DOS 风格的换行使用 &ldquo;\r\n&rdquo;，如果把这样的文件上传到 Unix/Linux，有些版本的 vi 不能识别 &ldquo;\r&rdquo;，所以 vi 显示时在行尾会出现 ^M 出来，但是有些就能识别 \r\n，正常显示回车换行。</p>
 <p>附部分 ASCII 码对照表：</p>
-<p><img src="https://images2018.cnblogs.com/blog/713744/201804/713744-20180420222924123-258532755.png" alt="img"></p>
+<p><img src="images/img-1.png" alt="img"></p>
 <p><strong>三、使用 Notepad++ 查看回车和换行符并相互转换</strong></p>
 <p>Notepad++ 中可以设置 Windows、Unix 和 Mac三种行尾换行符格式及其之间的转换，如下：</p>
 <p>默认不显示回车及换行符：</p>
-<p><img src="https://images2018.cnblogs.com/blog/713744/201804/713744-20180422101926963-428916886.png" alt="img"></p>
+<p><img src="images/img-1.png" alt="img"></p>
 <p>1）<strong>设置 Notepad++ 显示换行符</strong>，这样才能看到效果， 视图 -&gt; 显示符号 -&gt; 显示行尾符，如果是英文版的 Notepad++，则应该是 View -&gt; Show Symbol -&gt; Show End of Line；</p>
-<p><img src="https://images2018.cnblogs.com/blog/713744/201804/713744-20180420215144627-1037247402.png" alt="img"></p>
-<p><img src="https://images2018.cnblogs.com/blog/713744/201804/713744-20180420215237756-1976628572.png" alt="img"></p>
+<p><img src="images/img-1.png" alt="img"></p>
+<p><img src="images/img.png" alt="img"></p>
 <p>2）<strong>设置行尾符格式</strong>：编辑 -&gt; 档案格式转换 -&gt;（可选 Windows、Unix 和 Mac中的一种），如果是英文版的 Notepad++，则应该是 Edit -&gt; EOL Conversion -&gt; Windows Format、Unix/OSX Format、Old Mac Format。</p>
-<p><img src="https://images2018.cnblogs.com/blog/713744/201804/713744-20180420215348011-51271464.png" alt="img"></p>
-<p><img src="https://images2018.cnblogs.com/blog/713744/201804/713744-20180420215416648-1940111086.png" alt="img"></p>
+<p><img src="images/img-2.png" alt="img"></p>
+<p><img src="images/img-2.png" alt="img"></p>
 <p><strong>四、Linux 中去除 DOS/Windows 文档中出现的 &ldquo;^$&rdquo;</strong></p>
 <p>有时候将 Windows 中编辑好的文本上传到 LInux 服务器中使用，此时就需要将 Windows 中的 &ldquo;^$&rdquo; 去除，如下：</p>
 <div class="highlight"><div class="chroma">
@@ -218,11 +221,21 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>使用 <strong>cat -A</strong> 选项查看文本所有的字符，如下：</p>
-<p>[root@ryan linux]# cat -A win1.txt
-aaa bbbb^M$
-cccc^M$
-123^M$</p>
-<p>或者使用 <strong>cat -v</strong> 选项显示出非打印字符，如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[root@ryan linux]# cat -A win1.txt
+</span></span><span class="line"><span class="cl">aaa bbbb^M$
+</span></span><span class="line"><span class="cl">cccc^M$
+</span></span><span class="line"><span class="cl">123^M$
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者使用 <strong>cat -v</strong> 选项显示出非打印字符，如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -301,7 +314,11 @@ cccc^M$
           <a href="/tags/linux/">Linux</a>
           </div>
       <nav class="post-nav">
-        
+        <a class="prev" href="/post/%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E5%99%A8%E8%AE%BF%E9%97%AEwsl%E7%9B%AE%E5%BD%95/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">资源管理器访问wsl目录</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
         <a class="next" href="/post/vim%E7%9A%84diff%E6%A8%A1%E5%BC%8F/">
             <span class="next-text nav-default">vim的diff模式</span>
             <span class="next-text nav-mobile">下一篇</span>
