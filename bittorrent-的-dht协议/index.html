@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noodp" /><title>BitTorrent  的 DHT协议 - Fan的博客</title><meta name="Description" content="F的博客，简单技术分享，随便写点什么"><meta property="og:url" content="https://hugodoit.pages.dev/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/">
+  <meta property="og:site_name" content="Fan的博客">
+  <meta property="og:title" content="BitTorrent  的 DHT协议">
+  <meta property="og:description" content="本文介绍 BitTorrent 使用的 DHT（分布式哈希表）网络，它通常被称为 “Mainline DHT”。
+0.1 背景与目的最初，BitTorrent 依赖于 Tracker 服务器 来协调 Peer（下载或上传同一个文件的用户）之间的连接。用户客户端连接到 Tracker，报告自己的信息和想要的 Torrent 文件，Tracker 则返回其他正在下载/上传该文件的 Peer 的列表。这种方式的问题在于 Tracker 是一个中心点：">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-04-18T23:18:00+08:00">
+    <meta property="article:modified_time" content="2025-04-19T01:54:07+08:00">
+    <meta property="article:tag" content="BT">
+    <meta property="og:image" content="https://hugodoit.pages.dev/images/avatar.webp">
+      <meta property="og:see_also" content="https://hugodoit.pages.dev/krpc%E8%AF%B7%E6%B1%82%E6%A0%BC%E5%BC%8F/">
+      <meta property="og:see_also" content="https://hugodoit.pages.dev/kprc/">
+      <meta property="og:see_also" content="https://hugodoit.pages.dev/kademlia-%E7%AE%97%E6%B3%95-2/">
+      <meta property="og:see_also" content="https://hugodoit.pages.dev/kademlia-%E7%AE%97%E6%B3%95-1/">
+      <meta property="og:see_also" content="https://hugodoit.pages.dev/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hugodoit.pages.dev/images/avatar.webp">
+  <meta name="twitter:title" content="BitTorrent  的 DHT协议">
+  <meta name="twitter:description" content="本文介绍 BitTorrent 使用的 DHT（分布式哈希表）网络，它通常被称为 “Mainline DHT”。
+0.1 背景与目的最初，BitTorrent 依赖于 Tracker 服务器 来协调 Peer（下载或上传同一个文件的用户）之间的连接。用户客户端连接到 Tracker，报告自己的信息和想要的 Torrent 文件，Tracker 则返回其他正在下载/上传该文件的 Peer 的列表。这种方式的问题在于 Tracker 是一个中心点：">
+<meta name="application-name" content="Fan">
+<meta name="apple-mobile-web-app-title" content="Fan">
+
+<meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest">
+
+<link rel="canonical" href="https://hugodoit.pages.dev/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/" /><link rel="prev" href="https://hugodoit.pages.dev/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/" /><link rel="next" href="https://hugodoit.pages.dev/kademlia-%E7%AE%97%E6%B3%95-1/" />
+<link rel="stylesheet" href="/css/main.min.css"><link rel="stylesheet" href="/css/style.min.css">
+    
+    
+    
+    <script type="application/ld+json">{"@context": "https://schema.org","@type": "BlogPosting",
+        "headline": "BitTorrent  的 DHT协议",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://hugodoit.pages.dev/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/"
+        },"image": ["https://hugodoit.pages.dev/images/Apple-Devices-Preview.png"],"genre": "posts","keywords":["BT"],"wordcount":  2767 ,
+        "url": "https://hugodoit.pages.dev/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/","datePublished": "2025-04-18T23:18:00+08:00","dateModified": "2025-04-19T01:54:07+08:00","publisher": {
+            "@type": "Organization",
+            "name": "Fan","logo": "https://hugodoit.pages.dev/imgs/avatar.webp"},"author": {
+                "@type": "Person",
+                "name": "Fan",
+                "url": "https://github.com/sirius-fan"
+            },"description": ""
+    }</script></head>
+
+
+<body data-instant-intensity="viewport" class="tw-flex tw-min-h-screen tw-flex-col"><script type="text/javascript">
+    function setTheme(theme) {
+      document.body.setAttribute('theme', theme); 
+      document.documentElement.className = theme;
+      document.documentElement.style.setProperty('color-scheme', theme === 'light' ? 'light' : 'dark');
+      if (theme === 'light') {
+        document.documentElement.classList.remove('tw-dark')
+      } else {
+        document.documentElement.classList.add('tw-dark')
+      }
+      window.theme = theme;   
+      window.isDark = window.theme !== 'light' 
+    }
+    function saveTheme(theme) {window.localStorage && localStorage.setItem('theme', theme);}
+    function getMeta(metaName) {const metas = document.getElementsByTagName('meta'); for (let i = 0; i < metas.length; i++) if (metas[i].getAttribute('name') === metaName) return metas[i]; return '';}
+    if (window.localStorage && localStorage.getItem('theme')) {
+        let theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') {
+        setTheme(theme);
+        } else {
+            if ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+        }
+      } else { 
+        if ('auto' === 'light' || 'auto' === 'dark') 
+            setTheme('auto'), saveTheme('auto'); 
+        else saveTheme('auto'), window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light');
+    }
+    let metaColors = {'light': '#f8f8f8','dark': '#161b22'}
+    getMeta('theme-color').content = metaColors[document.body.getAttribute('theme')];
+    window.switchThemeEventSet = new Set()
+</script><div id="back-to-top"></div>
+    <div id="mask"></div><header class="desktop print:!tw-hidden" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Fan的博客"><img class="tw-inline tw-align-text-bottom tw-mr-1"  src='/imgs/avatar.webp'   alt="Sirius" height="32" width="32"><span id="desktop-header-typeit" class="typeit"></span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item"
+                    href="/posts/" > 所有文章 </a><a class="menu-item"
+                    href="/tags/" > 标签 </a><a class="menu-item"
+                    href="/categories/" > 分类 </a><a class="menu-item"
+                    href="/series/" > 系列 </a><a class="menu-item"
+                    href="/about/" > 关于 </a><a class="menu-item"
+                    href="https://github.com/sirius-fan"  title="GitHub" 
+                    rel="noopener noreferrer" target="_blank" ><i class='fab fa-github fa-fw'></i>  </a><span class="menu-item delimiter"></span><button class="menu-item language" aria-label="选择语言">简体中文<svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/></svg>
+                    <select class="language-select" aria-label="选择语言" id="language-select-desktop"
+                        onchange="location = this.value;"><option value="/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/"  selected>简体中文</option></select>
+                </button><span class="menu-item search" id="search-desktop">
+                    <input type="text"
+                        placeholder="搜索文章标题或内容..."
+                        id="search-input-desktop">
+                    <button class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                        <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+                    </button>
+                    <button class="search-button search-clear" id="search-clear-desktop" title="清空">
+                        <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"/></svg>
+                    </button>
+                    <span class="search-button search-loading tw-animate-spin" id="search-loading-desktop">
+                        <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"/></svg>
+                    </span>
+                </span><button class="menu-item theme-select" aria-label="切换主题">
+                    <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M8 256c0 136.966 111.033 248 248 248s248-111.034 248-248S392.966 8 256 8 8 119.033 8 256zm248 184V72c101.705 0 184 82.311 184 184 0 101.705-82.311 184-184 184z"/></svg>
+                    <select class="color-theme-select" id="theme-select-desktop" aria-label="切换主题">
+                        <option value="light">浅色</option>
+                        <option value="dark">深色</option>
+                        <option value="auto">跟随系统</option>
+                    </select>
+                </button></div>
+        </div>
+    </div>
+</header><header class="mobile print:!tw-hidden" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Fan的博客"><img class="tw-inline tw-align-text-bottom tw-mr-1"  src='/imgs/avatar.webp'   alt="Sirius" height="32" width="32"><span id="mobile-header-typeit" class="typeit"></span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                <div class="search mobile" id="search-mobile">
+                    <input type="text"
+                        placeholder="搜索文章标题或内容..."
+                        id="search-input-mobile">
+                    <button class="search-button search-toggle tw-h-10" id="search-toggle-mobile" title="搜索">
+                        <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+                    </button>
+                    <button class="search-button search-clear tw-h-fit" id="search-clear-mobile" title="清空">
+                        <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"/></svg>
+                    </button>
+                    <span class="search-button search-loading tw-animate-spin" id="search-loading-mobile">
+                        <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"/></svg>
+                    </span>
+                </div>
+                <button class="search-cancel" id="search-cancel-mobile">
+                    取消
+                </button>
+            </div><a class="menu-item" href="/posts/" title="" >所有文章</a><a class="menu-item" href="/tags/" title="" >标签</a><a class="menu-item" href="/categories/" title="" >分类</a><a class="menu-item" href="/series/" title="" >系列</a><a class="menu-item" href="/about/" title="" >关于</a><a class="menu-item" href="https://github.com/sirius-fan" title="GitHub" 
+                rel="noopener noreferrer" target="_blank" ><i class='fab fa-github fa-fw'></i></a><button class="menu-item theme-select tw-w-full" aria-label="切换主题">
+                <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M8 256c0 136.966 111.033 248 248 248s248-111.034 248-248S392.966 8 256 8 8 119.033 8 256zm248 184V72c101.705 0 184 82.311 184 184 0 101.705-82.311 184-184 184z"/></svg>
+                <select class="color-theme-select" id="theme-select-mobile" aria-label="切换主题">
+                    <option value="light">浅色</option>
+                    <option value="dark">深色</option>
+                    <option value="auto">跟随系统</option>
+                </select>
+            </button><button class="menu-item tw-w-full" title="">简体中文<svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/></svg>
+                <select class="language-select" title="" onchange="location = this.value;"><option value="/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/"  selected>简体中文</option></select>
+            </button></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div><main class="tw-mx-4 tw-flex-1"><div class="toc print:!tw-hidden" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#背景与目的"><strong>背景与目的</strong></a></li>
+        <li><a href="#基于-kademlia-的实现"><strong>基于 Kademlia 的实现</strong></a></li>
+        <li><a href="#关键区别与-bittorrent-特定应用"><strong>关键区别与 BitTorrent 特定应用</strong></a></li>
+        <li><a href="#核心工作流程查找和宣告-peer"><strong>核心工作流程：查找和宣告 Peer</strong></a></li>
+        <li><a href="#其他-rpcs"><strong>其他 RPCs</strong></a></li>
+        <li><a href="#引导-bootstrap"><strong>引导 (Bootstrap)</strong></a></li>
+        <li><a href="#dht总结">DHT总结</a></li>
+        <li><a href="#node-id-和-info_hash">Node ID 和 info_hash</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><dialog id="toc-dialog" class="tw-max-w-full tw-w-full tw-max-h-full tw-h-full tw-ml-16">
+        <div class="toc tw-mx-4 tw-max-w-full">
+            <h2 class="tw-mx-0 tw-my-6 tw-uppercase tw-text-2xl">目录</h2>
+            <div class="toc-content"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#背景与目的"><strong>背景与目的</strong></a></li>
+        <li><a href="#基于-kademlia-的实现"><strong>基于 Kademlia 的实现</strong></a></li>
+        <li><a href="#关键区别与-bittorrent-特定应用"><strong>关键区别与 BitTorrent 特定应用</strong></a></li>
+        <li><a href="#核心工作流程查找和宣告-peer"><strong>核心工作流程：查找和宣告 Peer</strong></a></li>
+        <li><a href="#其他-rpcs"><strong>其他 RPCs</strong></a></li>
+        <li><a href="#引导-bootstrap"><strong>引导 (Bootstrap)</strong></a></li>
+        <li><a href="#dht总结">DHT总结</a></li>
+        <li><a href="#node-id-和-info_hash">Node ID 和 info_hash</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+        </div>
+    </dialog><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single print:!tw-w-full print:!tw-max-w-none print:!tw-m-0 print:!tw-p-0"><h1 class="single-title" data-pagefind-meta="date:2025-04-18" data-pagefind-body>BitTorrent  的 DHT协议</h1><div class="post-meta">
+            <div class="post-meta-line">
+                <span class="post-author"><img class="tw-inline-block tw-max-h-4 tw-rounded-full tw-translate-y-[-2px] tw-mr-1"  src='/imgs/avatar.webp'   alt="Fan avatar" height="16" width="16"><a href="https://github.com/sirius-fan" title="Author" target="_blank" rel="noopener noreferrer author" class="author">Fan</a>
+                </span>&nbsp;<span class="post-category">收录于 </span>&nbsp;<span class="post-category">类别 <a href="/categories/bt/"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>BT</a></span>&nbsp;<span class="post-category">和</span>&nbsp;<span class="post-series">系列 <a href="/series/p2p%E4%B8%8B%E8%BD%BD%E8%A7%A3%E6%9E%90/"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M464 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V86a6 6 0 0 1 6-6h404a6 6 0 0 1 6 6v340a6 6 0 0 1-6 6zm-42-92v24c0 6.627-5.373 12-12 12H204c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h200c6.627 0 12 5.373 12 12zm0-96v24c0 6.627-5.373 12-12 12H204c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h200c6.627 0 12 5.373 12 12zm0-96v24c0 6.627-5.373 12-12 12H204c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h200c6.627 0 12 5.373 12 12zm-252 12c0 19.882-16.118 36-36 36s-36-16.118-36-36 16.118-36 36-36 36 16.118 36 36zm0 96c0 19.882-16.118 36-36 36s-36-16.118-36-36 16.118-36 36-36 36 16.118 36 36zm0 96c0 19.882-16.118 36-36 36s-36-16.118-36-36 16.118-36 36-36 36 16.118 36 36z"/></svg>P2P下载解析</a></span></div>
+            <div class="post-meta-line"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;<time datetime="2025-04-18">2025-04-18</time>&nbsp;<svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M402.3 344.9l32-32c5-5 13.7-1.5 13.7 5.7V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h273.5c7.1 0 10.7 8.6 5.7 13.7l-32 32c-1.5 1.5-3.5 2.3-5.7 2.3H48v352h352V350.5c0-2.1.8-4.1 2.3-5.6zm156.6-201.8L296.3 405.7l-90.4 10c-26.2 2.9-48.5-19.2-45.6-45.6l10-90.4L432.9 17.1c22.9-22.9 59.9-22.9 82.7 0l43.2 43.2c22.9 22.9 22.9 60 .1 82.8zM460.1 174L402 115.9 216.2 301.8l-7.3 65.3 65.3-7.3L460.1 174zm64.8-79.7l-43.2-43.2c-4.1-4.1-10.8-4.1-14.8 0L436 82l58.1 58.1 30.9-30.9c4-4.2 4-10.8-.1-14.9z"/></svg>&nbsp;<time datetime="2025-04-19">2025-04-19</time>&nbsp;<svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;约 2767 字&nbsp;
+                    <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;预计阅读 13 分钟&nbsp;</div>
+        </div><div class="details series-nav open">
+                                <div class="details-summary series-title">
+                                    <span>系列 - P2P下载解析</span>
+                                    <span class="details-icon"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg></span>
+                                </div>
+                                <div class="details-content series-content">
+                                    <nav>
+                                        <ul>
+                                                    <li><a href="/krpc%E8%AF%B7%E6%B1%82%E6%A0%BC%E5%BC%8F/">KRPC请求格式</a></li>
+                                                    <li><a href="/kprc/">KRPC</a></li>
+                                                    <li><a href="/kademlia-%E7%AE%97%E6%B3%95-2/">Kademlia 算法（二）</a></li>
+                                                    <li><a href="/kademlia-%E7%AE%97%E6%B3%95-1/">Kademlia 算法（一）</a></li><li><span class="active">BitTorrent  的 DHT协议</span></li>
+                                                    <li><a href="/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/">BT握手与TCP的连接与释放</a></li></ul>
+                                    </nav>
+                                </div>
+                            </div><div class="details toc print:!tw-block" id="toc-static"  kept="">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span class="details-icon"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#背景与目的"><strong>背景与目的</strong></a></li>
+        <li><a href="#基于-kademlia-的实现"><strong>基于 Kademlia 的实现</strong></a></li>
+        <li><a href="#关键区别与-bittorrent-特定应用"><strong>关键区别与 BitTorrent 特定应用</strong></a></li>
+        <li><a href="#核心工作流程查找和宣告-peer"><strong>核心工作流程：查找和宣告 Peer</strong></a></li>
+        <li><a href="#其他-rpcs"><strong>其他 RPCs</strong></a></li>
+        <li><a href="#引导-bootstrap"><strong>引导 (Bootstrap)</strong></a></li>
+        <li><a href="#dht总结">DHT总结</a></li>
+        <li><a href="#node-id-和-info_hash">Node ID 和 info_hash</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content" data-pagefind-body><p>本文介绍 BitTorrent 使用的 DHT（分布式哈希表）网络，它通常被称为 &ldquo;Mainline DHT&rdquo;。</p>
+<h3 id="背景与目的" class="headerLink">
+    <a href="#%e8%83%8c%e6%99%af%e4%b8%8e%e7%9b%ae%e7%9a%84" class="header-mark"></a>0.1 <strong>背景与目的</strong></h3><p>最初，BitTorrent 依赖于 <strong>Tracker 服务器</strong> 来协调 Peer（下载或上传同一个文件的用户）之间的连接。用户客户端连接到 Tracker，报告自己的信息和想要的 Torrent 文件，Tracker 则返回其他正在下载/上传该文件的 Peer 的列表。这种方式的问题在于 Tracker 是一个<strong>中心点</strong>：</p>
+<ol>
+<li><strong>单点故障</strong>：如果 Tracker 服务器宕机或关闭，依赖它的 Torrent 就很难找到新的 Peer。</li>
+<li><strong>可审查性/易受攻击</strong>：Tracker 容易被监控或攻击。</li>
+<li><strong>扩展性限制</strong>：大型 Tracker 需要处理大量连接。</li>
+</ol>
+<p>为了解决这些问题，BitTorrent 社区开发并集成了一个基于 Kademlia 算法的 DHT 网络。其<strong>主要目的</strong>是：</p>
+<ul>
+<li><strong>去中心化 Peer 发现</strong>：即使没有 Tracker 服务器，或者 Tracker 失效，客户端也能通过 DHT 网络找到其他下载相同 Torrent 的 Peer。</li>
+<li><strong>降低对 Tracker 的依赖</strong>：使得 &ldquo;Trackerless&rdquo; Torrent 成为可能，提高了整个 BitTorrent 生态的健壮性。</li>
+</ul>
+<h3 id="基于-kademlia-的实现" class="headerLink">
+    <a href="#%e5%9f%ba%e4%ba%8e-kademlia-%e7%9a%84%e5%ae%9e%e7%8e%b0" class="header-mark"></a>0.2 <strong>基于 Kademlia 的实现</strong></h3><p>BitTorrent 的 Mainline DHT 在很大程度上遵循了 Kademlia 算法的核心原则：</p>
+<ol>
+<li><strong>节点 ID</strong>：每个运行 DHT 功能的 BitTorrent 客户端（即 Peer）都会生成一个 160 位的随机 Node ID，代表其在 DHT 网络中的身份和位置。</li>
+<li><strong>XOR 距离</strong>：节点间以及节点与数据之间的“距离”同样使用 XOR 度量来计算。</li>
+<li><strong>K-桶 (k-buckets)</strong>：每个客户端维护一个路由表，包含若干 K-桶，用于存储它所知道的其他 DHT 节点（Peer）的信息（Node ID, IP 地址, UDP 端口），组织方式与标准 Kademlia 相同（按 XOR 距离范围划分，优先保留稳定节点）。</li>
+</ol>
+<h3 id="关键区别与-bittorrent-特定应用" class="headerLink">
+    <a href="#%e5%85%b3%e9%94%ae%e5%8c%ba%e5%88%ab%e4%b8%8e-bittorrent-%e7%89%b9%e5%ae%9a%e5%ba%94%e7%94%a8" class="header-mark"></a>0.3 <strong>关键区别与 BitTorrent 特定应用</strong></h3><p>与通用的 Kademlia 用于存储任意 (Key, Value) 不同，BitTorrent DHT 的核心应用是<strong>存储和查询 Peer 信息</strong>。</p>
+<ul>
+<li><strong>&ldquo;Key&rdquo; 是 Info-Hash</strong>：在 BitTorrent DHT 中，最重要的“Key”是 Torrent 文件的 <strong>Info-Hash</strong>。这是一个根据 Torrent 文件元数据（<code>info</code> 字典部分）计算出的 160 位哈希值，唯一标识了一个特定的 Torrent 内容。</li>
+<li><strong>&ldquo;Value&rdquo; 是 Peer 列表</strong>：DHT 网络存储的“Value”不是任意数据，而是与特定 Info-Hash 相关联的 <strong>Peer 联系信息列表</strong>（IP 地址和端口号）。</li>
+</ul>
+<h3 id="核心工作流程查找和宣告-peer" class="headerLink">
+    <a href="#%e6%a0%b8%e5%bf%83%e5%b7%a5%e4%bd%9c%e6%b5%81%e7%a8%8b%e6%9f%a5%e6%89%be%e5%92%8c%e5%ae%a3%e5%91%8a-peer" class="header-mark"></a>0.4 <strong>核心工作流程：查找和宣告 Peer</strong></h3><ol>
+<li>
+<p><strong>查找 Peer (<code>get_peers</code> RPC)</strong>：</p>
+<ul>
+<li>当一个 BitTorrent 客户端想要加入某个 Torrent（知道了它的 Info-Hash）时，它会将这个 <strong>Info-Hash</strong> 作为目标 Key，在 DHT 网络中发起查找。</li>
+<li>它执行类似 Kademlia 的迭代查找过程：向自己路由表中距离 Info-Hash 最近的节点发送 <code>get_peers</code> 请求。</li>
+<li>收到 <code>get_peers(info_hash)</code> 请求的节点：
+<ul>
+<li>如果它<strong>存储</strong>了该 Info-Hash 对应的 Peer 列表，它会返回这个列表（一部分或全部）。</li>
+<li>如果它<strong>没有</strong>存储该 Info-Hash 的 Peer 信息，它会像 Kademlia 的 <code>find_node</code> 一样，返回自己路由表中距离该 Info-Hash 最近的 <code>k</code> 个节点的信息。</li>
+</ul>
+</li>
+<li>发起查找的客户端不断向返回结果中更接近 Info-Hash 的节点发送 <code>get_peers</code> 请求，逐步缩小范围，直到找到拥有该 Torrent 的 Peer，或者已经查询了它所知道的最接近 Info-Hash 的 k 个节点。</li>
+<li><strong>重要</strong>：当节点回复 <code>get_peers</code> 时（无论是返回 Peer 列表还是节点列表），它还会附带一个临时的 <code>token</code>。这个 <code>token</code> 在稍后的宣告步骤中需要用到。</li>
+</ul>
+</li>
+<li>
+<p><strong>宣告自己 (<code>announce_peer</code> RPC)</strong>：</p>
+<ul>
+<li>一旦客户端开始下载某个 Torrent，为了让其他 Peer 能找到自己，它需要向 DHT 网络“宣告”自己的存在。</li>
+<li>它首先执行 <code>get_peers</code> 查找（如上所述），找到网络中距离该 Torrent 的 Info-Hash 最近的 <code>k</code> 个节点。</li>
+<li>然后，它向这些节点发送 <code>announce_peer</code> 请求。这个请求包含：
+<ul>
+<li>Torrent 的 Info-Hash。</li>
+<li>客户端监听 BitTorrent 连接的端口号。</li>
+<li>从之前该节点回复 <code>get_peers</code> 时收到的那个 <code>token</code>。</li>
+</ul>
+</li>
+<li>收到 <code>announce_peer</code> 请求的节点会验证 <code>token</code> (通常是基于该节点的 IP 地址和时间戳生成，有时效性)，验证通过后，它就会将发送方（宣告者）的 IP 地址和端口号存储起来，与对应的 Info-Hash 关联。这样，当其他 Peer 查询这个 Info-Hash 时，该节点就能提供宣告者的联系信息。</li>
+<li><strong>Token 的作用</strong>：防止任何人随意宣告任意 Peer 的信息，确保只有真正参与该 Torrent 下载（并执行过 <code>get_peers</code> 查询）的客户端才能成功宣告。</li>
+</ul>
+</li>
+</ol>
+<h3 id="其他-rpcs" class="headerLink">
+    <a href="#%e5%85%b6%e4%bb%96-rpcs" class="header-mark"></a>0.5 <strong>其他 RPCs</strong></h3><ul>
+<li><code>ping</code>: 与 Kademlia 相同，用于检查节点是否在线。</li>
+<li><code>find_node</code>: 与 Kademlia 相同，用于查找距离目标 ID 最近的节点，主要用于维护路由表。</li>
+</ul>
+<h3 id="引导-bootstrap" class="headerLink">
+    <a href="#%e5%bc%95%e5%af%bc-bootstrap" class="header-mark"></a>0.6 <strong>引导 (Bootstrap)</strong></h3><ul>
+<li>新启动的 BitTorrent 客户端需要知道至少一个已经在 DHT 网络中的节点地址（通常是一些长期运行的、硬编码在客户端或从上次运行保存下来的 “bootstrap nodes”，如 <code>router.bittorrent.com</code>）。</li>
+<li>通过向引导节点发送 <code>find_node</code> 请求（查找自己的 Node ID），客户端开始填充自己的路由表并融入 DHT 网络。</li>
+</ul>
+<h3 id="dht总结" class="headerLink">
+    <a href="#dht%e6%80%bb%e7%bb%93" class="header-mark"></a>0.7 DHT总结</h3><p>BitTorrent 的 Mainline DHT 是 Kademlia 算法的一个非常成功和广泛的应用实例。它通过去中心化的方式解决了 Peer 发现的关键问题，使得 BitTorrent 协议更加健壮和有弹性，不再完全依赖中心化的 Tracker 服务器。现代几乎所有的 BitTorrent 客户端都支持并默认启用了 DHT 功能。其核心机制就是利用 Kademlia 的路由和查找能力，专门用于在 P2P 网络中映射 Torrent 的 Info-Hash 到下载该 Torrent 的 Peer 列表。</p>
+<h3 id="node-id-和-info_hash" class="headerLink">
+    <a href="#node-id-%e5%92%8c-info_hash" class="header-mark"></a>0.8 Node ID 和 info_hash</h3><p>DHT 通常只有一个核心的路由表（基于 Kademlia 的 K-桶系统），它的组织结构是基于节点 ID 的。</p>
+<ol>
+<li>
+<p><strong>核心路由表 (K-桶):</strong></p>
+<ul>
+<li>每个 DHT 节点维护一个路由表，其结构是 Kademlia 的 <strong>K-桶 (k-buckets)</strong>。</li>
+<li>这个 K-桶系统是根据<strong>其他节点的 Node ID</strong> 与<strong>当前节点自身的 Node ID</strong> 之间的 <strong>XOR 距离</strong>来组织的。</li>
+<li>K-桶里存储的是它所知道的其他 DHT 节点的联系信息（Node ID, IP 地址, 端口号）。</li>
+<li><strong>这个路由表是用来进行所有查找操作的基础</strong>，无论是查找其他节点 (<code>find_node</code>) 还是查找存储特定信息（如 Peer 列表）的节点 (<code>get_peers</code>)。</li>
+</ul>
+</li>
+<li>
+<p><strong>查找过程如何使用这个路由表</strong>:</p>
+<ul>
+<li><strong>当执行 <code>find_node(target_node_id)</code> 时</strong>: 目标 Key 是一个<strong>节点 ID</strong>。节点使用 K-桶查找离 <code>target_node_id</code> XOR 距离最近的已知节点，并向它们查询，逐步迭代，最终找到离目标节点 ID 最近的一批节点。</li>
+<li><strong>当执行 <code>get_peers(info_hash)</code> 时</strong>: 目标 Key 是一个<strong>文件的 info_hash</strong>。虽然 <code>info_hash</code> 不是一个节点 ID，但它仍然是 Kademlia ID 空间中的一个点。节点<strong>同样使用基于 Node ID 的 K-桶路由表</strong>，查找其路由表中已知节点中，Node ID 与这个 <code>info_hash</code> 的 XOR 距离最近的那些节点。然后向这些节点发送 <code>get_peers</code> 请求，逐步迭代，最终找到在 XOR 距离上最接近该 <code>info_hash</code> 的一批节点。</li>
+</ul>
+</li>
+<li>
+<p><strong>Peer 列表的存储 (关键区别)</strong>:</p>
+<ul>
+<li><strong>路由表 (K-桶)</strong> 的作用是<strong>指路</strong>，告诉你“要找离目标 X 最近的节点，你应该去问谁”。</li>
+<li><strong>Peer 列表 (由 <code>announce_peer</code> 产生)</strong> 并不是存储在路由表里的。它是<strong>应用层的数据</strong>。</li>
+<li>那些<strong>其 Node ID 最接近特定 info_hash</strong> 的节点，除了维护自己的路由表外，还会<strong>额外</strong>维护一个<strong>数据存储区域</strong>（比如一个内存中的哈希表或字典）。这个区域用来存储 <code>announce_peer</code> 请求带来的信息，即：<code>info_hash -&gt; [ (IP1, Port1, timestamp1), (IP2, Port2, timestamp2), ... ]</code> 以及相关的 <code>token</code>。</li>
+<li>所以，<strong>存储 Peer 列表</strong>是那些“负责”该 info_hash 的节点的<strong>额外职责</strong>，它们使用一个独立于路由表的机制来存储这些数据。而其他节点只负责通过路由表把 <code>get_peers</code> 或 <code>announce_peer</code> 请求导向这些负责的节点。</li>
+</ul>
+</li>
+</ol>
+<p><strong>总结:</strong></p>
+<ul>
+<li>只有一个主要的<strong>路由表（K-桶系统）</strong>，它基于 <strong>Node ID</strong> 和 <strong>XOR 距离</strong>来组织，用于<strong>所有类型</strong>的查找（包括基于 info_hash 的查找）。</li>
+<li><code>info_hash</code> 作为 <code>get_peers</code> 的<strong>查找目标 Key</strong>，指导查找过程使用路由表向正确的方向进行。</li>
+<li><code>info_hash</code> 到 Peer 列表的映射关系，是作为<strong>数据</strong>被存储在那些 Node ID 最接近该 <code>info_hash</code> 的节点上的<strong>独立存储区域</strong>中，而不是存储在路由表本身里。</li>
+</ul>
+<p>可以理解为：路由表是地图和导航系统（基于节点地址），而 Peer 列表是特定地点（接近 info_hash 的节点）存放的公告板（上面写着参与者的联系方式）。导航系统（路由表）本身不记录公告板的内容，只负责把你带到正确的地点。</p>
+</div>
+
+        
+
+
+
+<h3>相关内容</h3>
+<div>
+    <a href="/krpc%E8%AF%B7%E6%B1%82%E6%A0%BC%E5%BC%8F/">KRPC请求格式</a>  <br/>
+        
+    <a href="/kprc/">KRPC</a>  <br/>
+        
+    <a href="/kademlia-%E7%AE%97%E6%B3%95-2/">Kademlia 算法（二）</a>  <br/>
+        
+    <a href="/kademlia-%E7%AE%97%E6%B3%95-1/">Kademlia 算法（一）</a>  <br/>
+        
+    <a href="/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/">BT握手与TCP的连接与释放</a>  <br/>
+        
+    
+
+</div>
+
+
+<div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2025-04-19</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line print:!tw-hidden">
+            <div class="post-info-md"><span><a class="link-to-mardown" href=/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/index.md target="_blank" rel="noopener noreferrer">阅读原始文档</a>
+                    </span><span>|&nbsp;<a class="link-to-source" href=https://github.com/sirius-fan/sirius-fan.github.io/tree/main/content/posts/BT/BitTorrent  的 DHT协议/BitTorrent  的 DHT协议.md target="_blank" rel="noopener noreferrer">查看源代码</a>
+                    </span><span>|&nbsp;<a class="link-to-report" href=https://github.com/sirius-fan/sirius-fan.github.io/issues/new?title=[bug]%20BitTorrent++%E7%9A%84+DHT%E5%8D%8F%E8%AE%AE&body=|Field|Value|%0A|-|-|%0A|Title|BitTorrent++%E7%9A%84+DHT%E5%8D%8F%E8%AE%AE|%0A|Url|https://hugodoit.pages.dev/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/|%0A|Filename|https://github.com/HEIGE-PCloud/DoIt/blob/main/exampleSite/content/posts/BT/BitTorrent  的 DHT协议/BitTorrent  的 DHT协议.md| target="_blank" rel="noopener noreferrer">报告问题</a>
+                    </span></div>
+            <div class="post-info-share"><button title="分享到 微博" data-sharer="weibo" data-url="https://hugodoit.pages.dev/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/" data-title="BitTorrent  的 DHT协议"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M407 177.6c7.6-24-13.4-46.8-37.4-41.7-22 4.8-28.8-28.1-7.1-32.8 50.1-10.9 92.3 37.1 76.5 84.8-6.8 21.2-38.8 10.8-32-10.3zM214.8 446.7C108.5 446.7 0 395.3 0 310.4c0-44.3 28-95.4 76.3-143.7C176 67 279.5 65.8 249.9 161c-4 13.1 12.3 5.7 12.3 6 79.5-33.6 140.5-16.8 114 51.4-3.7 9.4 1.1 10.9 8.3 13.1 135.7 42.3 34.8 215.2-169.7 215.2zm143.7-146.3c-5.4-55.7-78.5-94-163.4-85.7-84.8 8.6-148.8 60.3-143.4 116s78.5 94 163.4 85.7c84.8-8.6 148.8-60.3 143.4-116zM347.9 35.1c-25.9 5.6-16.8 43.7 8.3 38.3 72.3-15.2 134.8 52.8 111.7 124-7.4 24.2 29.1 37 37.4 12 31.9-99.8-55.1-195.9-157.4-174.3zm-78.5 311c-17.1 38.8-66.8 60-109.1 46.3-40.8-13.1-58-53.4-40.3-89.7 17.7-35.4 63.1-55.4 103.4-45.1 42 10.8 63.1 50.2 46 88.5zm-86.3-30c-12.9-5.4-30 .3-38 12.9-8.3 12.9-4.3 28 8.6 34 13.1 6 30.8.3 39.1-12.9 8-13.1 3.7-28.3-9.7-34zm32.6-13.4c-5.1-1.7-11.4.6-14.3 5.4-2.9 5.1-1.4 10.6 3.7 12.9 5.1 2 11.7-.3 14.6-5.4 2.8-5.2 1.1-10.9-4-12.9z"/></svg></button><button title="分享到 Telegram" data-sharer="telegram" data-url="https://hugodoit.pages.dev/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/" data-title="BitTorrent  的 DHT协议" data-web><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M446.7 98.6l-67.6 318.8c-5.1 22.5-18.4 28.1-37.3 17.5l-103-75.9-49.7 47.8c-5.5 5.5-10.1 10.1-20.7 10.1l7.4-104.9 190.9-172.5c8.3-7.4-1.8-11.5-12.9-4.1L117.8 284 16.2 252.2c-22.1-6.9-22.5-22.1 4.6-32.7L418.2 66.4c18.4-6.9 34.5 4.1 28.5 32.2z"/></svg></button></div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg>&nbsp;<a href="/tags/bt/">BT</a></section>
+        <section class="print:!tw-hidden">
+            <span><button class="tw-text-fgColor-link-muted hover:tw-text-fgColor-link-muted-hover" onclick="window.history.back();">返回</button></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav print:tw-hidden"><a href="/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/" class="prev" rel="prev" title="BT握手与TCP的连接与释放"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M31.7 239l136-136c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9L127.9 256l96.4 96.4c9.4 9.4 9.4 24.6 0 33.9L201.7 409c-9.4 9.4-24.6 9.4-33.9 0l-136-136c-9.5-9.4-9.5-24.6-.1-34z"/></svg>BT握手与TCP的连接与释放</a>
+            <a href="/kademlia-%E7%AE%97%E6%B3%95-1/" class="next" rel="next" title="Kademlia 算法（一）">Kademlia 算法（一）<svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg></a></div>
+</div>
+</article></main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">
+                    由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.148.1">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.4.2"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M402.3 344.9l32-32c5-5 13.7-1.5 13.7 5.7V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h273.5c7.1 0 10.7 8.6 5.7 13.7l-32 32c-1.5 1.5-3.5 2.3-5.7 2.3H48v352h352V350.5c0-2.1.8-4.1 2.3-5.6zm156.6-201.8L296.3 405.7l-90.4 10c-26.2 2.9-48.5-19.2-45.6-45.6l10-90.4L432.9 17.1c22.9-22.9 59.9-22.9 82.7 0l43.2 43.2c22.9 22.9 22.9 60 .1 82.8zM460.1 174L402 115.9 216.2 301.8l-7.3 65.3 65.3-7.3L460.1 174zm64.8-79.7l-43.2-43.2c-4.1-4.1-10.8-4.1-14.8 0L436 82l58.1 58.1 30.9-30.9c4-4.2 4-10.8-.1-14.9z"/></svg> DoIt</a>
+                </div><div class="footer-line"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 448c-110.532 0-200-89.451-200-200 0-110.531 89.451-200 200-200 110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200zm107.351-101.064c-9.614 9.712-45.53 41.396-104.065 41.396-82.43 0-140.484-61.425-140.484-141.567 0-79.152 60.275-139.401 139.762-139.401 55.531 0 88.738 26.62 97.593 34.779a11.965 11.965 0 0 1 1.936 15.322l-18.155 28.113c-3.841 5.95-11.966 7.282-17.499 2.921-8.595-6.776-31.814-22.538-61.708-22.538-48.303 0-77.916 35.33-77.916 80.082 0 41.589 26.888 83.692 78.277 83.692 32.657 0 56.843-19.039 65.726-27.225 5.27-4.857 13.596-4.039 17.82 1.738l19.865 27.17a11.947 11.947 0 0 1-1.152 15.518z"/></svg>2019 - 2025<span class="author">&nbsp;<a href="https://github.com/sirius-fan" target="_blank" rel="noopener noreferrer">Fan</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+            <div class="footer-line"></div>
+            <div class="footer-line">
+            </div>
+        </div><script>
+                    if('serviceWorker' in navigator) {
+                        navigator.serviceWorker
+                            .register('/sw.min.js', { scope: '/' })
+                            .then(function(registration) {
+                            });
+                
+                        navigator.serviceWorker
+                            .ready
+                            .then(function(registration) {
+                            });
+                    }
+                </script></footer><div class="print:!tw-hidden tw-flex tw-flex-col tw-fixed tw-right-4 tw-bottom-4 tw-gap-2"><a href="#back-to-top" id="back-to-top-button" class="tw-transition-opacity tw-opacity-0 tw-block tw-bg-bgColor-secondary tw-rounded-full" style="padding: 0.6rem; line-height: 1.3rem; font-size: 1rem;" title="回到顶部">
+      <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg>
+  </a>
+
+  <button id="toc-drawer-button" class="tw-block tw-bg-bgColor-secondary tw-rounded-full md:tw-hidden" style="padding: 0.6rem; line-height: 1.3rem; font-size: 1rem;">
+      <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"/></svg>
+  </button></div>
+
+<script>window.config={"autocomplete.min.js":"/lib/autocomplete/autocomplete.min.js","comment":{},"data":{"desktop-header-typeit":"Sirius","mobile-header-typeit":"Sirius"},"fuse.min.js":"/lib/fuse/fuse.min.js","search":{"distance":100,"findAllMatches":false,"fuseIndexURL":"/index.json","highlightTag":"em","ignoreFieldNorm":false,"ignoreLocation":true,"isCaseSensitive":false,"location":0,"maxResultLength":10,"minMatchCharLength":2,"noResultsFound":"没有找到结果","snippetLength":50,"threshold":0.1,"type":"fuse","useExtendedSearch":false},"sharerjs":true,"table":{"sort":true},"typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"desktop-header-typeit":["desktop-header-typeit"],"mobile-header-typeit":["mobile-header-typeit"]},"duration":-1,"speed":100}};</script><script
+    src="/lib/tablesort/tablesort.min.js"
+    
+  ></script><script
+    src="/lib/sharer/sharer.min.js"
+    
+  ></script><script
+    src="/lib/typeit/typeit.min.js"
+    
+  ></script><script
+    src="/js/theme.min.js"
+    
+      defer
+    
+  ></script>
+
+<script type="speculationrules">
+  {
+    "prerender": [
+      {
+        "where": { "href_matches": "/*" },
+        "eagerness": "moderate"
+      }
+    ]
+  }
+</script>
+</body>
+
+</html>

@@ -1,0 +1,104 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>所有文章 - Fan的博客</title>
+        <link>https://hugodoit.pages.dev/posts/</link>
+        <description>所有文章 | Fan的博客</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>fan097@outlook.com (Fan)</managingEditor>
+            <webMaster>fan097@outlook.com (Fan)</webMaster><lastBuildDate>Tue, 24 Jun 2025 17:08:49 &#43;0800</lastBuildDate><atom:link href="https://hugodoit.pages.dev/posts/" rel="self" type="application/rss+xml" /><item>
+    <title>golang 垃圾回收</title>
+    <link>https://hugodoit.pages.dev/gc/</link>
+    <pubDate>Thu, 24 Apr 2025 12:09:46 &#43;0800</pubDate><author>
+        <name>Fan</name>
+    </author><guid>https://hugodoit.pages.dev/gc/</guid>
+    <description><![CDATA[<p>GC使用的方法是并发三色标记加上混合写屏障</p>
+<h2 id="1-gc触发条件" class="headerLink">
+    <a href="#1-gc%e8%a7%a6%e5%8f%91%e6%9d%a1%e4%bb%b6" class="header-mark"></a>1 1. GC触发条件</h2><ul>
+<li><strong>堆内存增长</strong>：当堆内存使用量达到上次GC后的2倍时触发(默认配置为100%)</li>
+<li><strong>定时触发</strong>：默认2分钟强制触发一次GC</li>
+<li><strong>手动触发</strong>：调用<code>runtime.GC()</code></li>
+</ul>
+<h2 id="2-三色标记算法" class="headerLink">
+    <a href="#2-%e4%b8%89%e8%89%b2%e6%a0%87%e8%ae%b0%e7%ae%97%e6%b3%95" class="header-mark"></a>2 2. 三色标记算法</h2><p>Go使用<strong>三色并发标记清除算法</strong>：</p>]]></description>
+</item><item>
+    <title>channel 解读</title>
+    <link>https://hugodoit.pages.dev/chan/</link>
+    <pubDate>Sun, 23 Mar 2025 17:02:39 &#43;0800</pubDate><author>
+        <name>Fan</name>
+    </author><guid>https://hugodoit.pages.dev/chan/</guid>
+    <description><![CDATA[<h1 id="go-channel-详解" class="headerLink">
+    <a href="#go-channel-%e8%af%a6%e8%a7%a3" class="header-mark"></a>GO channel 详解</h1><p>本文是尽可能罗列channela知识点用来复习</p>
+<h2 id="0设计哲学" class="headerLink">
+    <a href="#0%e8%ae%be%e8%ae%a1%e5%93%b2%e5%ad%a6" class="header-mark"></a>1 0.设计哲学</h2><div class="code-block highlight is-open show-line-numbers  tw-group tw-my-2">
+  <div class="
+    
+    tw-flex 
+    tw-flex-row
+    tw-flex-1 
+    tw-justify-between 
+    tw-w-full tw-bg-bgColor-secondary
+    ">      
+    <button 
+      class="
+        code-block-button
+        tw-mx-2 
+        tw-flex
+        tw-flex-row
+        tw-flex-1"
+      aria-hidden="true">
+          <div class="group-[.is-open]:tw-rotate-90 tw-transition-[transform] tw-duration-500 tw-ease-in-out print:!tw-hidden tw-w-min tw-h-min tw-my-1 tw-mx-1"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/></svg></div>
+          <p class="tw-select-none !tw-my-1">text</p>]]></description>
+</item><item>
+    <title>MySQL学习笔记</title>
+    <link>https://hugodoit.pages.dev/mysql%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+    <pubDate>Thu, 24 Apr 2025 15:34:14 &#43;0800</pubDate><author>
+        <name>Fan</name>
+    </author><guid>https://hugodoit.pages.dev/mysql%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
+    <description><![CDATA[<p>{% blockquote 黑马程序员  
+<a href="https://www.bilibili.com/video/BV1Kr4y1i7ru/?share_source=copy_web&amp;vd_source=e43c1de8e41e1499f7f3fdb03fba0eb6">https://www.bilibili.com/video/BV1Kr4y1i7ru/?share_source=copy_web&vd_source=e43c1de8e41e1499f7f3fdb03fba0eb6</a> 黑马程序员 MySQL数据库入门到精通，从mysql安装到mysql高级、mysql优化全囊括 %}
+{% endblockquote %}</p>
+<!-- more -->
+<p>在此非常感谢两位热爱学习的小伙伴的鼎力相助，帮助我们完成了所有的章节内容，使得本篇超长笔记得以完结。至此，整个MySQL笔记从入门到高级的所有内容都已编写完毕。</p>]]></description>
+</item><item>
+    <title>KRPC请求格式</title>
+    <link>https://hugodoit.pages.dev/krpc%E8%AF%B7%E6%B1%82%E6%A0%BC%E5%BC%8F/</link>
+    <pubDate>Sun, 20 Apr 2025 11:12:20 &#43;0800</pubDate><author>
+        <name>Fan</name>
+    </author><guid>https://hugodoit.pages.dev/krpc%E8%AF%B7%E6%B1%82%E6%A0%BC%E5%BC%8F/</guid>
+    <description><![CDATA[<p>所有的 KRPC 消息都是通过 UDP 传输的、经过 Bencode 编码的字典。
+本文主要介绍<code>find_node</code>、 <code>get_peers</code> 和 <code>announce_peer</code> 这三个 RPC 调用的请求和响应消息结构。</p>
+<p><strong>通用结构元素:</strong></p>
+<ul>
+<li><strong><code>t</code></strong>: 事务 ID (Transaction ID)，二进制字符串，由请求方设置，响应方必须在响应中原样返回。</li>
+<li><strong><code>y</code></strong>: 消息类型 (Message Type)，单个字符，&lsquo;q&rsquo; 代表查询 (Query)，&lsquo;r&rsquo; 代表响应 (Response)，&rsquo;e&rsquo; 代表错误 (Error)。</li>
+<li><strong><code>v</code></strong> (可选): 客户端版本信息 (Version)，通常是字符串。</li>
+<li><strong><code>ip</code></strong> (可选，通常在响应中出现): 响应者看到的请求者的公网 IP 地址和端口 (紧凑的 6 字节二进制字符串)。</li>
+</ul>
+<hr>
+<h3 id="1find_node-rpc" class="headerLink">
+    <a href="#1find_node-rpc" class="header-mark"></a>0.1 1、<code>find_node</code> RPC</h3><p><strong>目的:</strong> 向一个节点请求，获取它所知道的、其 Node ID 在 XOR 距离上最接近指定 <code>target</code> Node ID 的 <code>k</code> 个节点的联系信息。这主要用于路由表的填充和更新，以及在其他查找（如 <code>get_peers</code>）中进行迭代查询。
+<code>find_node</code> 请求用于询问某个节点：“请告诉我你认识的、离 <code>target</code> 这个 Node ID 最近的那些节点是谁？”。响应则直接返回一个包含这些节点（最多 k 个）联系信息的紧凑字符串。这个 RPC 是 DHT 网络进行节点发现和路由的基础。</p>]]></description>
+</item><item>
+    <title>KRPC</title>
+    <link>https://hugodoit.pages.dev/kprc/</link>
+    <pubDate>Sun, 20 Apr 2025 09:19:18 &#43;0800</pubDate><author>
+        <name>Fan</name>
+    </author><guid>https://hugodoit.pages.dev/kprc/</guid>
+    <description><![CDATA[<p>好的，我们来详细介绍一下 KRPC 协议。这是 BitTorrent Mainline DHT 网络中节点之间进行通信所使用的协议。
+KRPC 是 BitTorrent DHT 的基石通信协议。它利用 UDP 的高效性和 Bencode 的简洁性，定义了一套清晰的查询/响应机制（<code>ping</code>, <code>find_node</code>, <code>get_peers</code>, <code>announce_peer</code>）以及错误处理方式</p>]]></description>
+</item><item>
+    <title>Kademlia 算法（二）</title>
+    <link>https://hugodoit.pages.dev/kademlia-%E7%AE%97%E6%B3%95-2/</link>
+    <pubDate>Fri, 18 Apr 2025 23:18:08 &#43;0800</pubDate><author>
+        <name>Fan</name>
+    </author><guid>https://hugodoit.pages.dev/kademlia-%E7%AE%97%E6%B3%95-2/</guid>
+    <description><![CDATA[<h2 id="算法流程" class="headerLink">
+    <a href="#%e7%ae%97%e6%b3%95%e6%b5%81%e7%a8%8b" class="header-mark"></a>1 算法流程</h2><p><strong>1. 节点 ID (Node ID)</strong></p>
+<ul>
+<li><strong>结构</strong>：通常是一个 160 位或 256 位的随机数。这个长度决定了网络的理论最大规模以及发生 ID 碰撞（两个节点生成相同 ID）的概率（极低）。</li>
+<li><strong>生成</strong>：节点第一次启动时，通常会随机生成自己的 Node ID。这个 ID 在节点的生命周期内保持不变。</li>
+<li><strong>意义</strong>：ID 不仅仅是标识符，它定义了节点在 Kademlia “地址空间”中的位置。</li>
+</ul>
+<p><strong>2. XOR 距离度量 (XOR Metric)</strong></p>]]></description>
+</item></channel>
+</rss>

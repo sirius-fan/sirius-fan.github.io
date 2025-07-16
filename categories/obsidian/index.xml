@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Obsidian on Fan的博客</title>
+    <link>https://hugodoit.pages.dev/categories/obsidian/</link>
+    <description>Recent content in Obsidian on Fan的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-CN</language>
+    <managingEditor>fan097@outlook.com (Fan)</managingEditor>
+    <webMaster>fan097@outlook.com (Fan)</webMaster>
+    <lastBuildDate>Fri, 18 Apr 2025 22:07:01 +0800</lastBuildDate>
+    <atom:link href="https://hugodoit.pages.dev/categories/obsidian/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>obsidian 生成 Frontmatter</title>
+      <link>https://hugodoit.pages.dev/obsidian-%E7%94%9F%E6%88%90-frontmatter/</link>
+      <pubDate>Fri, 18 Apr 2025 21:43:45 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/obsidian-%E7%94%9F%E6%88%90-frontmatter/</guid>
+      <description>&lt;p&gt;官方自带的模板还是太弱了, 如果需要自动生成frontmatter，还是需要第三方插件&lt;/p&gt;&#xA;&lt;p&gt;目前是利用这个插件，因为使用js生成内容，所以理论上什么都可以用模板来填&#xA;&#xA;&lt;a href=&#34;https://github.com/SilentVoid13/Templater&#34;&gt;https://github.com/SilentVoid13/Templater&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>obsidian从零开始搭建hugo博客（二）快速建站</title>
+      <link>https://hugodoit.pages.dev/obsidian%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2%E4%BA%8C%E5%BF%AB%E9%80%9F%E5%BB%BA%E7%AB%99/</link>
+      <pubDate>Fri, 10 Nov 2023 07:05:46 +0000</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/obsidian%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2%E4%BA%8C%E5%BF%AB%E9%80%9F%E5%BB%BA%E7%AB%99/</guid>
+      <description>&lt;p&gt;在这个教程中，你将：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;生成站点&lt;/li&gt;&#xA;&lt;li&gt;添加文档&lt;/li&gt;&#xA;&lt;li&gt;配置站点&lt;/li&gt;&#xA;&lt;li&gt;发布文档&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;注意，官方文档表示Windows用户不能用powershell执行以下命令，但是我用powershell大部分步骤都是没问题的，有问题的步骤会特别指出。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>obsidian从零开始搭建hugo博客（一）环境安装</title>
+      <link>https://hugodoit.pages.dev/obsidian%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2%E4%B8%80%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/</link>
+      <pubDate>Thu, 09 Nov 2023 23:33:58 +0000</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/obsidian%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2%E4%B8%80%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/</guid>
+      <description>&lt;h2 id=&#34;安装hugo静态博客生成程序&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#%e5%ae%89%e8%a3%85hugo%e9%9d%99%e6%80%81%e5%8d%9a%e5%ae%a2%e7%94%9f%e6%88%90%e7%a8%8b%e5%ba%8f&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;1 安装hugo（静态博客生成程序）&lt;/h2&gt;&lt;p&gt;&#xA;&lt;a href=&#34;https://github.com/gohugoio/hugo/releases/tag/v0.120.4&#34;&gt;https://github.com/gohugoio/hugo/releases/tag/v0.120.4&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h3 id=&#34;配置hugo环境变量&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#%e9%85%8d%e7%bd%aehugo%e7%8e%af%e5%a2%83%e5%8f%98%e9%87%8f&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;1.1 配置hugo环境变量&lt;/h3&gt;&lt;p&gt;为什么要配置环境变量？配置的原因是使得这个二进制文件可以在终端任意地方执行，如果你不配置环境变量，那么终端只能在软件所在目录下执行该程序。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>obsidian插件开发-链接的显示问题</title>
+      <link>https://hugodoit.pages.dev/obsidian%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91-%E9%93%BE%E6%8E%A5%E7%9A%84%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Thu, 09 Nov 2023 20:45:18 +0000</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/obsidian%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91-%E9%93%BE%E6%8E%A5%E7%9A%84%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98/</guid>
+      <description>&lt;h1 id=&#34;问题&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#%e9%97%ae%e9%a2%98&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;问题&lt;/h1&gt;&lt;p&gt;由于obsidian中插入的链接都是以文件名称作为显示，而hugo博客大部分页面都是index.zh-cn.md，真正的名称保存在front-matter以及父类名称里面。那么带来的问题就是所有插入的链接显示都是 index.zh-cn.md而不是真正的名称。&lt;/p&gt;&#xA;&lt;p&gt;例如 &lt;code&gt;[index.zh-cn](../../用obsidian管理hugo文章小技巧/index.zh-cn.md)&lt;/code&gt;, 显示效果就是 index.zh-cn，但是实际上我们想要显示的名称是&lt;code&gt;用obsidian管理hugo文章小技巧&lt;/code&gt;。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>obsidian插件开发-常用文件操作</title>
+      <link>https://hugodoit.pages.dev/obsidian%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91-%E5%B8%B8%E7%94%A8%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/</link>
+      <pubDate>Sun, 05 Nov 2023 16:55:11 +0000</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/obsidian%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91-%E5%B8%B8%E7%94%A8%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/</guid>
+      <description>&lt;p&gt;将要操作的文件目录结构如图所示&#xA;&lt;img class=&#34;tw-inline&#34; loading=&#34;lazy&#34; src=&#39;Pasted%20image%2020231106010926.png&#39;     &gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;一文件操作&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#%e4%b8%80%e6%96%87%e4%bb%b6%e6%93%8d%e4%bd%9c&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;7 一、文件操作&lt;/h2&gt;&lt;h3 id=&#34;创建文件&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#%e5%88%9b%e5%bb%ba%e6%96%87%e4%bb%b6&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;7.1 创建文件&lt;/h3&gt;&lt;div class=&#34;code-block highlight is-open show-line-numbers  tw-group tw-my-2&#34;&gt;&#xA;  &lt;div class=&#34;&#xA;    &#xA;    tw-flex &#xA;    tw-flex-row&#xA;    tw-flex-1 &#xA;    tw-justify-between &#xA;    tw-w-full tw-bg-bgColor-secondary&#xA;    &#34;&gt;      &#xA;    &lt;button &#xA;      class=&#34;&#xA;        code-block-button&#xA;        tw-mx-2 &#xA;        tw-flex&#xA;        tw-flex-row&#xA;        tw-flex-1&#34;&#xA;      aria-hidden=&#34;true&#34;&gt;&#xA;          &lt;div class=&#34;group-[.is-open]:tw-rotate-90 tw-transition-[transform] tw-duration-500 tw-ease-in-out print:!tw-hidden tw-w-min tw-h-min tw-my-1 tw-mx-1&#34;&gt;&lt;svg class=&#34;icon&#34;&#xA;    xmlns=&#34;http://www.w3.org/2000/svg&#34; viewBox=&#34;0 0 320 512&#34;&gt;&lt;!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --&gt;&lt;path d=&#34;M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z&#34;/&gt;&lt;/svg&gt;&lt;/div&gt;&#xA;          &lt;p class=&#34;tw-select-none !tw-my-1&#34;&gt;js&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>用obsidian管理hugo文章小技巧</title>
+      <link>https://hugodoit.pages.dev/%E7%94%A8obsidian%E7%AE%A1%E7%90%86hugo%E6%96%87%E7%AB%A0%E5%B0%8F%E6%8A%80%E5%B7%A7/</link>
+      <pubDate>Sun, 05 Nov 2023 23:31:00 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/%E7%94%A8obsidian%E7%AE%A1%E7%90%86hugo%E6%96%87%E7%AB%A0%E5%B0%8F%E6%8A%80%E5%B7%A7/</guid>
+      <description>&lt;h2 id=&#34;一搜索技巧&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#%e4%b8%80%e6%90%9c%e7%b4%a2%e6%8a%80%e5%b7%a7&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;1 一、搜索技巧&lt;/h2&gt;&lt;p&gt;&lt;img class=&#34;tw-inline&#34; loading=&#34;lazy&#34; src=&#39;Pasted%20image%2020231109053716.png&#39;     &gt;&lt;/p&gt;&#xA;&lt;p&gt;举例：查找所有草稿，即查找所有markdown文件中，属性draft为true的帖子。obsidian提供了一个 &lt;code&gt;[propertiees: value]&lt;/code&gt; 的方法，于是我们输入 &lt;code&gt;[&amp;quot;draft&amp;quot;: true]&lt;/code&gt;，于是显示出结果如下&#xA;&lt;img class=&#34;tw-inline&#34; loading=&#34;lazy&#34; src=&#39;Pasted%20image%2020231109053543.png&#39;     &gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>obsidian插件开发（一）入门</title>
+      <link>https://hugodoit.pages.dev/obsidian%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91%E4%B8%80%E5%85%A5%E9%97%A8/</link>
+      <pubDate>Sun, 05 Nov 2023 17:51:00 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/obsidian%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91%E4%B8%80%E5%85%A5%E9%97%A8/</guid>
+      <description>&lt;h1 id=&#34;obsidian介绍&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#obsidian%e4%bb%8b%e7%bb%8d&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;Obsidian介绍&lt;/h1&gt;&lt;p&gt;obsidian是一款支持本地存储以及多种方式云端同步的笔记软件，界面很简洁，本质上开箱即用。但是如果你想要实现更多功能，要么去插件市场找，如果没有找到合适的，那就一起来动手自己做一个插件吧！&lt;/p&gt;&#xA;&lt;h1 id=&#34;克隆插件样本到本地&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#%e5%85%8b%e9%9a%86%e6%8f%92%e4%bb%b6%e6%a0%b7%e6%9c%ac%e5%88%b0%e6%9c%ac%e5%9c%b0&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;克隆插件样本到本地&lt;/h1&gt;&lt;p&gt;打开官网 &#xA;&lt;a href=&#34;https://github.com/obsidianmd/obsidian-sample-plugin&#34;&gt;https://github.com/obsidianmd/obsidian-sample-plugin&lt;/a&gt;&#xA;选择Create a new repository，这样你就会获得一份克隆&#xA;&lt;img class=&#34;tw-inline&#34; loading=&#34;lazy&#34; src=&#39;Pasted%20image%2020231105175821.png&#39;     &gt;&lt;/p&gt;&#xA;&lt;p&gt;随便起一个名字&#xA;&lt;img class=&#34;tw-inline&#34; loading=&#34;lazy&#34; src=&#39;Pasted%20image%2020231105175947.png&#39;     &gt;&lt;/p&gt;&#xA;&lt;p&gt;接着下载到本地&lt;/p&gt;&#xA;&lt;div class=&#34;code-block highlight is-open show-line-numbers  tw-group tw-my-2&#34;&gt;&#xA;  &lt;div class=&#34;&#xA;    &#xA;    tw-flex &#xA;    tw-flex-row&#xA;    tw-flex-1 &#xA;    tw-justify-between &#xA;    tw-w-full tw-bg-bgColor-secondary&#xA;    &#34;&gt;      &#xA;    &lt;button &#xA;      class=&#34;&#xA;        code-block-button&#xA;        tw-mx-2 &#xA;        tw-flex&#xA;        tw-flex-row&#xA;        tw-flex-1&#34;&#xA;      aria-hidden=&#34;true&#34;&gt;&#xA;          &lt;div class=&#34;group-[.is-open]:tw-rotate-90 tw-transition-[transform] tw-duration-500 tw-ease-in-out print:!tw-hidden tw-w-min tw-h-min tw-my-1 tw-mx-1&#34;&gt;&lt;svg class=&#34;icon&#34;&#xA;    xmlns=&#34;http://www.w3.org/2000/svg&#34; viewBox=&#34;0 0 320 512&#34;&gt;&lt;!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --&gt;&lt;path d=&#34;M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z&#34;/&gt;&lt;/svg&gt;&lt;/div&gt;&#xA;          &lt;p class=&#34;tw-select-none !tw-my-1&#34;&gt;text&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

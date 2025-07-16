@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>KRPC on Fan的博客</title>
+    <link>https://hugodoit.pages.dev/categories/krpc/</link>
+    <description>Recent content in KRPC on Fan的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-CN</language>
+    <managingEditor>fan097@outlook.com (Fan)</managingEditor>
+    <webMaster>fan097@outlook.com (Fan)</webMaster>
+    <lastBuildDate>Mon, 23 Jun 2025 16:37:59 +0800</lastBuildDate>
+    <atom:link href="https://hugodoit.pages.dev/categories/krpc/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>KRPC请求格式</title>
+      <link>https://hugodoit.pages.dev/krpc%E8%AF%B7%E6%B1%82%E6%A0%BC%E5%BC%8F/</link>
+      <pubDate>Sun, 20 Apr 2025 11:12:20 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/krpc%E8%AF%B7%E6%B1%82%E6%A0%BC%E5%BC%8F/</guid>
+      <description>&lt;p&gt;所有的 KRPC 消息都是通过 UDP 传输的、经过 Bencode 编码的字典。&#xA;本文主要介绍&lt;code&gt;find_node&lt;/code&gt;、 &lt;code&gt;get_peers&lt;/code&gt; 和 &lt;code&gt;announce_peer&lt;/code&gt; 这三个 RPC 调用的请求和响应消息结构。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;通用结构元素:&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;t&lt;/code&gt;&lt;/strong&gt;: 事务 ID (Transaction ID)，二进制字符串，由请求方设置，响应方必须在响应中原样返回。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;y&lt;/code&gt;&lt;/strong&gt;: 消息类型 (Message Type)，单个字符，&amp;lsquo;q&amp;rsquo; 代表查询 (Query)，&amp;lsquo;r&amp;rsquo; 代表响应 (Response)，&amp;rsquo;e&amp;rsquo; 代表错误 (Error)。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;v&lt;/code&gt;&lt;/strong&gt; (可选): 客户端版本信息 (Version)，通常是字符串。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;&lt;code&gt;ip&lt;/code&gt;&lt;/strong&gt; (可选，通常在响应中出现): 响应者看到的请求者的公网 IP 地址和端口 (紧凑的 6 字节二进制字符串)。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;h3 id=&#34;1find_node-rpc&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#1find_node-rpc&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;0.1 1、&lt;code&gt;find_node&lt;/code&gt; RPC&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;目的:&lt;/strong&gt; 向一个节点请求，获取它所知道的、其 Node ID 在 XOR 距离上最接近指定 &lt;code&gt;target&lt;/code&gt; Node ID 的 &lt;code&gt;k&lt;/code&gt; 个节点的联系信息。这主要用于路由表的填充和更新，以及在其他查找（如 &lt;code&gt;get_peers&lt;/code&gt;）中进行迭代查询。&#xA;&lt;code&gt;find_node&lt;/code&gt; 请求用于询问某个节点：“请告诉我你认识的、离 &lt;code&gt;target&lt;/code&gt; 这个 Node ID 最近的那些节点是谁？”。响应则直接返回一个包含这些节点（最多 k 个）联系信息的紧凑字符串。这个 RPC 是 DHT 网络进行节点发现和路由的基础。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

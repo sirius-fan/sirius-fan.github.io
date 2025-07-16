@@ -1,56 +1,84 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Categories on Xavier の Blog</title>
-    <link>http://blog.vv80.top/categories/</link>
-    <description>Recent content in Categories on Xavier の Blog</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
-    <lastBuildDate>Mon, 09 May 2022 16:35:26 +0800</lastBuildDate><atom:link href="http://blog.vv80.top/categories/index.xml" rel="self" type="application/rss+xml" />
+    <title>Categories on Fan的博客</title>
+    <link>https://hugodoit.pages.dev/categories/</link>
+    <description>Recent content in Categories on Fan的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-CN</language>
+    <managingEditor>fan097@outlook.com (Fan)</managingEditor>
+    <webMaster>fan097@outlook.com (Fan)</webMaster>
+    <lastBuildDate>Tue, 24 Jun 2025 12:09:46 +0800</lastBuildDate>
+    <atom:link href="https://hugodoit.pages.dev/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>tutorial</title>
-      <link>http://blog.vv80.top/categories/tutorial/</link>
-      <pubDate>Mon, 09 May 2022 16:35:26 +0800</pubDate>
-      
-      <guid>http://blog.vv80.top/categories/tutorial/</guid>
+      <title>数据库</title>
+      <link>https://hugodoit.pages.dev/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/</link>
+      <pubDate>Thu, 24 Apr 2025 15:34:14 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>wsl</title>
-      <link>http://blog.vv80.top/categories/wsl/</link>
-      <pubDate>Sat, 30 Apr 2022 19:58:35 +0800</pubDate>
-      
-      <guid>http://blog.vv80.top/categories/wsl/</guid>
+      <title>Golang</title>
+      <link>https://hugodoit.pages.dev/categories/golang/</link>
+      <pubDate>Thu, 24 Apr 2025 12:09:46 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/categories/golang/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>error</title>
-      <link>http://blog.vv80.top/categories/error/</link>
-      <pubDate>Fri, 29 Apr 2022 21:03:58 +0800</pubDate>
-      
-      <guid>http://blog.vv80.top/categories/error/</guid>
+      <title>BT</title>
+      <link>https://hugodoit.pages.dev/categories/bt/</link>
+      <pubDate>Sun, 20 Apr 2025 11:12:20 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/categories/bt/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>config</title>
-      <link>http://blog.vv80.top/categories/config/</link>
-      <pubDate>Wed, 23 Dec 2020 22:00:14 +0000</pubDate>
-      
-      <guid>http://blog.vv80.top/categories/config/</guid>
+      <title>KRPC</title>
+      <link>https://hugodoit.pages.dev/categories/krpc/</link>
+      <pubDate>Sun, 20 Apr 2025 11:12:20 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/categories/krpc/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>python</title>
-      <link>http://blog.vv80.top/categories/python/</link>
-      <pubDate>Wed, 23 Dec 2020 22:00:14 +0000</pubDate>
-      
-      <guid>http://blog.vv80.top/categories/python/</guid>
+      <title>Obsidian</title>
+      <link>https://hugodoit.pages.dev/categories/obsidian/</link>
+      <pubDate>Fri, 18 Apr 2025 21:43:45 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/categories/obsidian/</guid>
       <description></description>
     </item>
-    
+    <item>
+      <title>软件折腾</title>
+      <link>https://hugodoit.pages.dev/categories/%E8%BD%AF%E4%BB%B6%E6%8A%98%E8%85%BE/</link>
+      <pubDate>Fri, 18 Apr 2025 21:43:45 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/categories/%E8%BD%AF%E4%BB%B6%E6%8A%98%E8%85%BE/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Linux</title>
+      <link>https://hugodoit.pages.dev/categories/linux/</link>
+      <pubDate>Sun, 04 Feb 2024 04:36:28 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/categories/linux/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>玩机</title>
+      <link>https://hugodoit.pages.dev/categories/%E7%8E%A9%E6%9C%BA/</link>
+      <pubDate>Sun, 04 Feb 2024 04:36:28 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/categories/%E7%8E%A9%E6%9C%BA/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Obsidian插件开发</title>
+      <link>https://hugodoit.pages.dev/categories/obsidian%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/</link>
+      <pubDate>Thu, 09 Nov 2023 20:45:18 +0000</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/categories/obsidian%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>文档</title>
+      <link>https://hugodoit.pages.dev/categories/documentation/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/categories/documentation/</guid>
+      <description></description>
+    </item>
   </channel>
 </rss>

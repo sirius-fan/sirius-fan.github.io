@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>利用obsidian从零开始搭建hugo博客 on Fan的博客</title>
+    <link>https://hugodoit.pages.dev/series/%E5%88%A9%E7%94%A8obsidian%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/</link>
+    <description>Recent content in 利用obsidian从零开始搭建hugo博客 on Fan的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-CN</language>
+    <managingEditor>fan097@outlook.com (Fan)</managingEditor>
+    <webMaster>fan097@outlook.com (Fan)</webMaster>
+    <lastBuildDate>Fri, 18 Apr 2025 22:07:01 +0800</lastBuildDate>
+    <atom:link href="https://hugodoit.pages.dev/series/%E5%88%A9%E7%94%A8obsidian%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>obsidian 生成 Frontmatter</title>
+      <link>https://hugodoit.pages.dev/obsidian-%E7%94%9F%E6%88%90-frontmatter/</link>
+      <pubDate>Fri, 18 Apr 2025 21:43:45 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/obsidian-%E7%94%9F%E6%88%90-frontmatter/</guid>
+      <description>&lt;p&gt;官方自带的模板还是太弱了, 如果需要自动生成frontmatter，还是需要第三方插件&lt;/p&gt;&#xA;&lt;p&gt;目前是利用这个插件，因为使用js生成内容，所以理论上什么都可以用模板来填&#xA;&#xA;&lt;a href=&#34;https://github.com/SilentVoid13/Templater&#34;&gt;https://github.com/SilentVoid13/Templater&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>obsidian从零开始搭建hugo博客（二）快速建站</title>
+      <link>https://hugodoit.pages.dev/obsidian%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2%E4%BA%8C%E5%BF%AB%E9%80%9F%E5%BB%BA%E7%AB%99/</link>
+      <pubDate>Fri, 10 Nov 2023 07:05:46 +0000</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/obsidian%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2%E4%BA%8C%E5%BF%AB%E9%80%9F%E5%BB%BA%E7%AB%99/</guid>
+      <description>&lt;p&gt;在这个教程中，你将：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;生成站点&lt;/li&gt;&#xA;&lt;li&gt;添加文档&lt;/li&gt;&#xA;&lt;li&gt;配置站点&lt;/li&gt;&#xA;&lt;li&gt;发布文档&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;注意，官方文档表示Windows用户不能用powershell执行以下命令，但是我用powershell大部分步骤都是没问题的，有问题的步骤会特别指出。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>obsidian从零开始搭建hugo博客（一）环境安装</title>
+      <link>https://hugodoit.pages.dev/obsidian%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2%E4%B8%80%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/</link>
+      <pubDate>Thu, 09 Nov 2023 23:33:58 +0000</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/obsidian%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2%E4%B8%80%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/</guid>
+      <description>&lt;h2 id=&#34;安装hugo静态博客生成程序&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#%e5%ae%89%e8%a3%85hugo%e9%9d%99%e6%80%81%e5%8d%9a%e5%ae%a2%e7%94%9f%e6%88%90%e7%a8%8b%e5%ba%8f&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;1 安装hugo（静态博客生成程序）&lt;/h2&gt;&lt;p&gt;&#xA;&lt;a href=&#34;https://github.com/gohugoio/hugo/releases/tag/v0.120.4&#34;&gt;https://github.com/gohugoio/hugo/releases/tag/v0.120.4&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h3 id=&#34;配置hugo环境变量&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#%e9%85%8d%e7%bd%aehugo%e7%8e%af%e5%a2%83%e5%8f%98%e9%87%8f&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;1.1 配置hugo环境变量&lt;/h3&gt;&lt;p&gt;为什么要配置环境变量？配置的原因是使得这个二进制文件可以在终端任意地方执行，如果你不配置环境变量，那么终端只能在软件所在目录下执行该程序。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

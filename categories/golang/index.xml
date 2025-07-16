@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Golang on Fan的博客</title>
+    <link>https://hugodoit.pages.dev/categories/golang/</link>
+    <description>Recent content in Golang on Fan的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-CN</language>
+    <managingEditor>fan097@outlook.com (Fan)</managingEditor>
+    <webMaster>fan097@outlook.com (Fan)</webMaster>
+    <lastBuildDate>Tue, 24 Jun 2025 12:09:46 +0800</lastBuildDate>
+    <atom:link href="https://hugodoit.pages.dev/categories/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>golang 垃圾回收</title>
+      <link>https://hugodoit.pages.dev/gc/</link>
+      <pubDate>Thu, 24 Apr 2025 12:09:46 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/gc/</guid>
+      <description>&lt;p&gt;GC使用的方法是并发三色标记加上混合写屏障&lt;/p&gt;&#xA;&lt;h2 id=&#34;1-gc触发条件&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#1-gc%e8%a7%a6%e5%8f%91%e6%9d%a1%e4%bb%b6&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;1 1. GC触发条件&lt;/h2&gt;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;堆内存增长&lt;/strong&gt;：当堆内存使用量达到上次GC后的2倍时触发(默认配置为100%)&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;定时触发&lt;/strong&gt;：默认2分钟强制触发一次GC&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;手动触发&lt;/strong&gt;：调用&lt;code&gt;runtime.GC()&lt;/code&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;2-三色标记算法&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#2-%e4%b8%89%e8%89%b2%e6%a0%87%e8%ae%b0%e7%ae%97%e6%b3%95&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;2 2. 三色标记算法&lt;/h2&gt;&lt;p&gt;Go使用&lt;strong&gt;三色并发标记清除算法&lt;/strong&gt;：&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>channel 解读</title>
+      <link>https://hugodoit.pages.dev/chan/</link>
+      <pubDate>Sun, 23 Mar 2025 17:02:39 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/chan/</guid>
+      <description>&lt;h1 id=&#34;go-channel-详解&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#go-channel-%e8%af%a6%e8%a7%a3&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;GO channel 详解&lt;/h1&gt;&lt;p&gt;本文是尽可能罗列channela知识点用来复习&lt;/p&gt;&#xA;&lt;h2 id=&#34;0设计哲学&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#0%e8%ae%be%e8%ae%a1%e5%93%b2%e5%ad%a6&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;1 0.设计哲学&lt;/h2&gt;&lt;div class=&#34;code-block highlight is-open show-line-numbers  tw-group tw-my-2&#34;&gt;&#xA;  &lt;div class=&#34;&#xA;    &#xA;    tw-flex &#xA;    tw-flex-row&#xA;    tw-flex-1 &#xA;    tw-justify-between &#xA;    tw-w-full tw-bg-bgColor-secondary&#xA;    &#34;&gt;      &#xA;    &lt;button &#xA;      class=&#34;&#xA;        code-block-button&#xA;        tw-mx-2 &#xA;        tw-flex&#xA;        tw-flex-row&#xA;        tw-flex-1&#34;&#xA;      aria-hidden=&#34;true&#34;&gt;&#xA;          &lt;div class=&#34;group-[.is-open]:tw-rotate-90 tw-transition-[transform] tw-duration-500 tw-ease-in-out print:!tw-hidden tw-w-min tw-h-min tw-my-1 tw-mx-1&#34;&gt;&lt;svg class=&#34;icon&#34;&#xA;    xmlns=&#34;http://www.w3.org/2000/svg&#34; viewBox=&#34;0 0 320 512&#34;&gt;&lt;!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --&gt;&lt;path d=&#34;M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z&#34;/&gt;&lt;/svg&gt;&lt;/div&gt;&#xA;          &lt;p class=&#34;tw-select-none !tw-my-1&#34;&gt;text&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

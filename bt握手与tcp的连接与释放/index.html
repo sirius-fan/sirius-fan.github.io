@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noodp" /><title>BT握手与TCP的连接与释放 - Fan的博客</title><meta name="Description" content="F的博客，简单技术分享，随便写点什么"><meta property="og:url" content="https://hugodoit.pages.dev/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/">
+  <meta property="og:site_name" content="Fan的博客">
+  <meta property="og:title" content="BT握手与TCP的连接与释放">
+  <meta property="og:description" content="定位了DHT爬虫的一个问题，在这梳理一下BT握手流程
+BitTorrent 客户端（假设为 A）与另一个 Peer（假设为 B）从建立 TCP 连接开始，经过标准握手、扩展握手，最终到通过 ut_metadata 扩展获取种子元数据的完整流程">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-04-18T23:18:00+08:00">
+    <meta property="article:modified_time" content="2025-04-19T01:59:07+08:00">
+    <meta property="article:tag" content="BT">
+    <meta property="og:image" content="https://hugodoit.pages.dev/images/avatar.webp">
+      <meta property="og:see_also" content="https://hugodoit.pages.dev/krpc%E8%AF%B7%E6%B1%82%E6%A0%BC%E5%BC%8F/">
+      <meta property="og:see_also" content="https://hugodoit.pages.dev/kprc/">
+      <meta property="og:see_also" content="https://hugodoit.pages.dev/kademlia-%E7%AE%97%E6%B3%95-2/">
+      <meta property="og:see_also" content="https://hugodoit.pages.dev/kademlia-%E7%AE%97%E6%B3%95-1/">
+      <meta property="og:see_also" content="https://hugodoit.pages.dev/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hugodoit.pages.dev/images/avatar.webp">
+  <meta name="twitter:title" content="BT握手与TCP的连接与释放">
+  <meta name="twitter:description" content="定位了DHT爬虫的一个问题，在这梳理一下BT握手流程
+BitTorrent 客户端（假设为 A）与另一个 Peer（假设为 B）从建立 TCP 连接开始，经过标准握手、扩展握手，最终到通过 ut_metadata 扩展获取种子元数据的完整流程">
+<meta name="application-name" content="Fan">
+<meta name="apple-mobile-web-app-title" content="Fan">
+
+<meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest">
+
+<link rel="canonical" href="https://hugodoit.pages.dev/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/" /><link rel="prev" href="https://hugodoit.pages.dev/obsidian-%E7%94%9F%E6%88%90-frontmatter/" /><link rel="next" href="https://hugodoit.pages.dev/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/" />
+<link rel="stylesheet" href="/css/main.min.css"><link rel="stylesheet" href="/css/style.min.css">
+    
+    
+    
+    <script type="application/ld+json">{"@context": "https://schema.org","@type": "BlogPosting",
+        "headline": "BT握手与TCP的连接与释放",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://hugodoit.pages.dev/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/"
+        },"image": ["https://hugodoit.pages.dev/images/Apple-Devices-Preview.png"],"genre": "posts","keywords":["BT"],"wordcount":  3110 ,
+        "url": "https://hugodoit.pages.dev/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/","datePublished": "2025-04-18T23:18:00+08:00","dateModified": "2025-04-19T01:59:07+08:00","publisher": {
+            "@type": "Organization",
+            "name": "Fan","logo": "https://hugodoit.pages.dev/imgs/avatar.webp"},"author": {
+                "@type": "Person",
+                "name": "Fan",
+                "url": "https://github.com/sirius-fan"
+            },"description": ""
+    }</script></head>
+
+
+<body data-instant-intensity="viewport" class="tw-flex tw-min-h-screen tw-flex-col"><script type="text/javascript">
+    function setTheme(theme) {
+      document.body.setAttribute('theme', theme); 
+      document.documentElement.className = theme;
+      document.documentElement.style.setProperty('color-scheme', theme === 'light' ? 'light' : 'dark');
+      if (theme === 'light') {
+        document.documentElement.classList.remove('tw-dark')
+      } else {
+        document.documentElement.classList.add('tw-dark')
+      }
+      window.theme = theme;   
+      window.isDark = window.theme !== 'light' 
+    }
+    function saveTheme(theme) {window.localStorage && localStorage.setItem('theme', theme);}
+    function getMeta(metaName) {const metas = document.getElementsByTagName('meta'); for (let i = 0; i < metas.length; i++) if (metas[i].getAttribute('name') === metaName) return metas[i]; return '';}
+    if (window.localStorage && localStorage.getItem('theme')) {
+        let theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') {
+        setTheme(theme);
+        } else {
+            if ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+        }
+      } else { 
+        if ('auto' === 'light' || 'auto' === 'dark') 
+            setTheme('auto'), saveTheme('auto'); 
+        else saveTheme('auto'), window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light');
+    }
+    let metaColors = {'light': '#f8f8f8','dark': '#161b22'}
+    getMeta('theme-color').content = metaColors[document.body.getAttribute('theme')];
+    window.switchThemeEventSet = new Set()
+</script><div id="back-to-top"></div>
+    <div id="mask"></div><header class="desktop print:!tw-hidden" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Fan的博客"><img class="tw-inline tw-align-text-bottom tw-mr-1"  src='/imgs/avatar.webp'   alt="Sirius" height="32" width="32"><span id="desktop-header-typeit" class="typeit"></span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item"
+                    href="/posts/" > 所有文章 </a><a class="menu-item"
+                    href="/tags/" > 标签 </a><a class="menu-item"
+                    href="/categories/" > 分类 </a><a class="menu-item"
+                    href="/series/" > 系列 </a><a class="menu-item"
+                    href="/about/" > 关于 </a><a class="menu-item"
+                    href="https://github.com/sirius-fan"  title="GitHub" 
+                    rel="noopener noreferrer" target="_blank" ><i class='fab fa-github fa-fw'></i>  </a><span class="menu-item delimiter"></span><button class="menu-item language" aria-label="选择语言">简体中文<svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/></svg>
+                    <select class="language-select" aria-label="选择语言" id="language-select-desktop"
+                        onchange="location = this.value;"><option value="/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/"  selected>简体中文</option></select>
+                </button><span class="menu-item search" id="search-desktop">
+                    <input type="text"
+                        placeholder="搜索文章标题或内容..."
+                        id="search-input-desktop">
+                    <button class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                        <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+                    </button>
+                    <button class="search-button search-clear" id="search-clear-desktop" title="清空">
+                        <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"/></svg>
+                    </button>
+                    <span class="search-button search-loading tw-animate-spin" id="search-loading-desktop">
+                        <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"/></svg>
+                    </span>
+                </span><button class="menu-item theme-select" aria-label="切换主题">
+                    <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M8 256c0 136.966 111.033 248 248 248s248-111.034 248-248S392.966 8 256 8 8 119.033 8 256zm248 184V72c101.705 0 184 82.311 184 184 0 101.705-82.311 184-184 184z"/></svg>
+                    <select class="color-theme-select" id="theme-select-desktop" aria-label="切换主题">
+                        <option value="light">浅色</option>
+                        <option value="dark">深色</option>
+                        <option value="auto">跟随系统</option>
+                    </select>
+                </button></div>
+        </div>
+    </div>
+</header><header class="mobile print:!tw-hidden" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Fan的博客"><img class="tw-inline tw-align-text-bottom tw-mr-1"  src='/imgs/avatar.webp'   alt="Sirius" height="32" width="32"><span id="mobile-header-typeit" class="typeit"></span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                <div class="search mobile" id="search-mobile">
+                    <input type="text"
+                        placeholder="搜索文章标题或内容..."
+                        id="search-input-mobile">
+                    <button class="search-button search-toggle tw-h-10" id="search-toggle-mobile" title="搜索">
+                        <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+                    </button>
+                    <button class="search-button search-clear tw-h-fit" id="search-clear-mobile" title="清空">
+                        <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"/></svg>
+                    </button>
+                    <span class="search-button search-loading tw-animate-spin" id="search-loading-mobile">
+                        <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"/></svg>
+                    </span>
+                </div>
+                <button class="search-cancel" id="search-cancel-mobile">
+                    取消
+                </button>
+            </div><a class="menu-item" href="/posts/" title="" >所有文章</a><a class="menu-item" href="/tags/" title="" >标签</a><a class="menu-item" href="/categories/" title="" >分类</a><a class="menu-item" href="/series/" title="" >系列</a><a class="menu-item" href="/about/" title="" >关于</a><a class="menu-item" href="https://github.com/sirius-fan" title="GitHub" 
+                rel="noopener noreferrer" target="_blank" ><i class='fab fa-github fa-fw'></i></a><button class="menu-item theme-select tw-w-full" aria-label="切换主题">
+                <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M8 256c0 136.966 111.033 248 248 248s248-111.034 248-248S392.966 8 256 8 8 119.033 8 256zm248 184V72c101.705 0 184 82.311 184 184 0 101.705-82.311 184-184 184z"/></svg>
+                <select class="color-theme-select" id="theme-select-mobile" aria-label="切换主题">
+                    <option value="light">浅色</option>
+                    <option value="dark">深色</option>
+                    <option value="auto">跟随系统</option>
+                </select>
+            </button><button class="menu-item tw-w-full" title="">简体中文<svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/></svg>
+                <select class="language-select" title="" onchange="location = this.value;"><option value="/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/"  selected>简体中文</option></select>
+            </button></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div><main class="tw-mx-4 tw-flex-1"><div class="toc print:!tw-hidden" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#前提"><strong>前提:</strong></a></li>
+        <li><a href="#流程步骤"><strong>流程步骤:</strong></a></li>
+        <li><a href="#阶段一建立-tcp-连接"><strong>阶段一：建立 TCP 连接</strong></a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#1-a-发起连接">1. <strong>A 发起连接:</strong></a></li>
+                <li><a href="#2-b-响应连接">2. <strong>B 响应连接:</strong></a></li>
+                <li><a href="#3-a-确认连接">3. <strong>A 确认连接:</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#阶段二bittorrent-标准握手-bep-3"><strong>阶段二：BitTorrent 标准握手 (BEP-3)</strong></a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#4-a-发送握手信息第106号">4. <strong>A 发送握手信息（第106号）:</strong></a></li>
+                <li><a href="#5-b-接收并验证握手信息">5. <strong>B 接收并验证握手信息:</strong></a></li>
+                <li><a href="#6-b-发送握手信息108">6. <strong>B 发送握手信息（108）:</strong></a></li>
+                <li><a href="#7-a-接收并验证握手信息只读取68-可见108大小为333">7. <strong>A 接收并验证握手信息（只读取68, 可见108大小为333）:</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#阶段三扩展协议握手-bep-10---条件性"><strong>阶段三：扩展协议握手 (BEP-10) - 条件性</strong></a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#8-a-发送扩展握手110">8. <strong>A 发送扩展握手（110）:</strong></a></li>
+                <li><a href="#9-b-接收并处理扩展握手">9. <strong>B 接收并处理扩展握手:</strong></a></li>
+                <li><a href="#10-b-发送扩展握手">10. <strong>B 发送扩展握手:</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#阶段四元数据交换-"><strong>阶段四：元数据交换 (<code>ut_metadata</code>, BEP-9) - 条件性</strong></a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#12-a-请求元数据块1002">12. <strong>A 请求元数据块（1002）:</strong></a></li>
+                <li><a href="#13-b-接收请求并发送数据块">13. <strong>B 接收请求并发送数据块:</strong></a></li>
+                <li><a href="#14-a-接收并存储数据块">14. <strong>A 接收并存储数据块:</strong></a></li>
+                <li><a href="#15-a-请求并接收后续块-如果需要">15. <strong>A 请求并接收后续块 (如果需要):</strong></a></li>
+                <li><a href="#16-a-完成接收并校验">16. <strong>A 完成接收并校验:</strong></a></li>
+                <li><a href="#17-手动关闭了连接">17. <strong>手动关闭了连接</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#其他"><strong>其他</strong></a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><dialog id="toc-dialog" class="tw-max-w-full tw-w-full tw-max-h-full tw-h-full tw-ml-16">
+        <div class="toc tw-mx-4 tw-max-w-full">
+            <h2 class="tw-mx-0 tw-my-6 tw-uppercase tw-text-2xl">目录</h2>
+            <div class="toc-content"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#前提"><strong>前提:</strong></a></li>
+        <li><a href="#流程步骤"><strong>流程步骤:</strong></a></li>
+        <li><a href="#阶段一建立-tcp-连接"><strong>阶段一：建立 TCP 连接</strong></a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#1-a-发起连接">1. <strong>A 发起连接:</strong></a></li>
+                <li><a href="#2-b-响应连接">2. <strong>B 响应连接:</strong></a></li>
+                <li><a href="#3-a-确认连接">3. <strong>A 确认连接:</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#阶段二bittorrent-标准握手-bep-3"><strong>阶段二：BitTorrent 标准握手 (BEP-3)</strong></a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#4-a-发送握手信息第106号">4. <strong>A 发送握手信息（第106号）:</strong></a></li>
+                <li><a href="#5-b-接收并验证握手信息">5. <strong>B 接收并验证握手信息:</strong></a></li>
+                <li><a href="#6-b-发送握手信息108">6. <strong>B 发送握手信息（108）:</strong></a></li>
+                <li><a href="#7-a-接收并验证握手信息只读取68-可见108大小为333">7. <strong>A 接收并验证握手信息（只读取68, 可见108大小为333）:</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#阶段三扩展协议握手-bep-10---条件性"><strong>阶段三：扩展协议握手 (BEP-10) - 条件性</strong></a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#8-a-发送扩展握手110">8. <strong>A 发送扩展握手（110）:</strong></a></li>
+                <li><a href="#9-b-接收并处理扩展握手">9. <strong>B 接收并处理扩展握手:</strong></a></li>
+                <li><a href="#10-b-发送扩展握手">10. <strong>B 发送扩展握手:</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#阶段四元数据交换-"><strong>阶段四：元数据交换 (<code>ut_metadata</code>, BEP-9) - 条件性</strong></a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#12-a-请求元数据块1002">12. <strong>A 请求元数据块（1002）:</strong></a></li>
+                <li><a href="#13-b-接收请求并发送数据块">13. <strong>B 接收请求并发送数据块:</strong></a></li>
+                <li><a href="#14-a-接收并存储数据块">14. <strong>A 接收并存储数据块:</strong></a></li>
+                <li><a href="#15-a-请求并接收后续块-如果需要">15. <strong>A 请求并接收后续块 (如果需要):</strong></a></li>
+                <li><a href="#16-a-完成接收并校验">16. <strong>A 完成接收并校验:</strong></a></li>
+                <li><a href="#17-手动关闭了连接">17. <strong>手动关闭了连接</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#其他"><strong>其他</strong></a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+        </div>
+    </dialog><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single print:!tw-w-full print:!tw-max-w-none print:!tw-m-0 print:!tw-p-0"><h1 class="single-title" data-pagefind-meta="date:2025-04-18" data-pagefind-body>BT握手与TCP的连接与释放</h1><div class="post-meta">
+            <div class="post-meta-line">
+                <span class="post-author"><img class="tw-inline-block tw-max-h-4 tw-rounded-full tw-translate-y-[-2px] tw-mr-1"  src='/imgs/avatar.webp'   alt="Fan avatar" height="16" width="16"><a href="https://github.com/sirius-fan" title="Author" target="_blank" rel="noopener noreferrer author" class="author">Fan</a>
+                </span>&nbsp;<span class="post-category">收录于 </span>&nbsp;<span class="post-category">类别 <a href="/categories/bt/"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>BT</a></span>&nbsp;<span class="post-category">和</span>&nbsp;<span class="post-series">系列 <a href="/series/p2p%E4%B8%8B%E8%BD%BD%E8%A7%A3%E6%9E%90/"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M464 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V86a6 6 0 0 1 6-6h404a6 6 0 0 1 6 6v340a6 6 0 0 1-6 6zm-42-92v24c0 6.627-5.373 12-12 12H204c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h200c6.627 0 12 5.373 12 12zm0-96v24c0 6.627-5.373 12-12 12H204c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h200c6.627 0 12 5.373 12 12zm0-96v24c0 6.627-5.373 12-12 12H204c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h200c6.627 0 12 5.373 12 12zm-252 12c0 19.882-16.118 36-36 36s-36-16.118-36-36 16.118-36 36-36 36 16.118 36 36zm0 96c0 19.882-16.118 36-36 36s-36-16.118-36-36 16.118-36 36-36 36 16.118 36 36zm0 96c0 19.882-16.118 36-36 36s-36-16.118-36-36 16.118-36 36-36 36 16.118 36 36z"/></svg>P2P下载解析</a></span></div>
+            <div class="post-meta-line"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;<time datetime="2025-04-18">2025-04-18</time>&nbsp;<svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M402.3 344.9l32-32c5-5 13.7-1.5 13.7 5.7V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h273.5c7.1 0 10.7 8.6 5.7 13.7l-32 32c-1.5 1.5-3.5 2.3-5.7 2.3H48v352h352V350.5c0-2.1.8-4.1 2.3-5.6zm156.6-201.8L296.3 405.7l-90.4 10c-26.2 2.9-48.5-19.2-45.6-45.6l10-90.4L432.9 17.1c22.9-22.9 59.9-22.9 82.7 0l43.2 43.2c22.9 22.9 22.9 60 .1 82.8zM460.1 174L402 115.9 216.2 301.8l-7.3 65.3 65.3-7.3L460.1 174zm64.8-79.7l-43.2-43.2c-4.1-4.1-10.8-4.1-14.8 0L436 82l58.1 58.1 30.9-30.9c4-4.2 4-10.8-.1-14.9z"/></svg>&nbsp;<time datetime="2025-04-19">2025-04-19</time>&nbsp;<svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;约 3110 字&nbsp;
+                    <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;预计阅读 14 分钟&nbsp;</div>
+        </div><div class="details series-nav open">
+                                <div class="details-summary series-title">
+                                    <span>系列 - P2P下载解析</span>
+                                    <span class="details-icon"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg></span>
+                                </div>
+                                <div class="details-content series-content">
+                                    <nav>
+                                        <ul>
+                                                    <li><a href="/krpc%E8%AF%B7%E6%B1%82%E6%A0%BC%E5%BC%8F/">KRPC请求格式</a></li>
+                                                    <li><a href="/kprc/">KRPC</a></li>
+                                                    <li><a href="/kademlia-%E7%AE%97%E6%B3%95-2/">Kademlia 算法（二）</a></li>
+                                                    <li><a href="/kademlia-%E7%AE%97%E6%B3%95-1/">Kademlia 算法（一）</a></li>
+                                                    <li><a href="/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/">BitTorrent  的 DHT协议</a></li><li><span class="active">BT握手与TCP的连接与释放</span></li></ul>
+                                    </nav>
+                                </div>
+                            </div><div class="details toc print:!tw-block" id="toc-static"  kept="">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span class="details-icon"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#前提"><strong>前提:</strong></a></li>
+        <li><a href="#流程步骤"><strong>流程步骤:</strong></a></li>
+        <li><a href="#阶段一建立-tcp-连接"><strong>阶段一：建立 TCP 连接</strong></a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#1-a-发起连接">1. <strong>A 发起连接:</strong></a></li>
+                <li><a href="#2-b-响应连接">2. <strong>B 响应连接:</strong></a></li>
+                <li><a href="#3-a-确认连接">3. <strong>A 确认连接:</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#阶段二bittorrent-标准握手-bep-3"><strong>阶段二：BitTorrent 标准握手 (BEP-3)</strong></a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#4-a-发送握手信息第106号">4. <strong>A 发送握手信息（第106号）:</strong></a></li>
+                <li><a href="#5-b-接收并验证握手信息">5. <strong>B 接收并验证握手信息:</strong></a></li>
+                <li><a href="#6-b-发送握手信息108">6. <strong>B 发送握手信息（108）:</strong></a></li>
+                <li><a href="#7-a-接收并验证握手信息只读取68-可见108大小为333">7. <strong>A 接收并验证握手信息（只读取68, 可见108大小为333）:</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#阶段三扩展协议握手-bep-10---条件性"><strong>阶段三：扩展协议握手 (BEP-10) - 条件性</strong></a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#8-a-发送扩展握手110">8. <strong>A 发送扩展握手（110）:</strong></a></li>
+                <li><a href="#9-b-接收并处理扩展握手">9. <strong>B 接收并处理扩展握手:</strong></a></li>
+                <li><a href="#10-b-发送扩展握手">10. <strong>B 发送扩展握手:</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#阶段四元数据交换-"><strong>阶段四：元数据交换 (<code>ut_metadata</code>, BEP-9) - 条件性</strong></a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#12-a-请求元数据块1002">12. <strong>A 请求元数据块（1002）:</strong></a></li>
+                <li><a href="#13-b-接收请求并发送数据块">13. <strong>B 接收请求并发送数据块:</strong></a></li>
+                <li><a href="#14-a-接收并存储数据块">14. <strong>A 接收并存储数据块:</strong></a></li>
+                <li><a href="#15-a-请求并接收后续块-如果需要">15. <strong>A 请求并接收后续块 (如果需要):</strong></a></li>
+                <li><a href="#16-a-完成接收并校验">16. <strong>A 完成接收并校验:</strong></a></li>
+                <li><a href="#17-手动关闭了连接">17. <strong>手动关闭了连接</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#其他"><strong>其他</strong></a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content" data-pagefind-body><p>定位了DHT爬虫的一个问题，在这梳理一下BT握手流程</p>
+<p>BitTorrent 客户端（假设为 A）与另一个 Peer（假设为 B）从建立 TCP 连接开始，经过标准握手、扩展握手，最终到通过 <code>ut_metadata</code> 扩展获取种子元数据的完整流程</p>
+<h3 id="前提" class="headerLink">
+    <a href="#%e5%89%8d%e6%8f%90" class="header-mark"></a>0.1 <strong>前提:</strong></h3><ul>
+<li>客户端 A 知道 Peer B 的 IP 地址和监听端口 (IP_B, Port_B)。</li>
+<li>客户端 A 知道它感兴趣的种子的 <code>info_hash</code>。</li>
+<li>客户端 A <strong>没有</strong>这个种子的元数据通过磁力连接向B请求这个种子的信息</li>
+<li>我们假设 Peer B 拥有这个种子的元数据，并且支持 BEP-10 扩展协议和 <code>ut_metadata</code> 扩展。</li>
+<li>环境是我本地的环境这里A的地址为192.168.30.125:59806, B的地址是192.168.30.230:63219</li>
+</ul>
+<h3 id="流程步骤" class="headerLink">
+    <a href="#%e6%b5%81%e7%a8%8b%e6%ad%a5%e9%aa%a4" class="header-mark"></a>0.2 <strong>流程步骤:</strong></h3><p>整体的流程如图，除了最后一次挥手没等停止抓包了，</p>
+<p><img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415204630.png'     ></p>
+<p>图中长度66的都是没有其他信息的，
+dMAC(6)+sMAC(6)+type(2)(ipv4 0x0800) = 14
+IP 头 5 * 4 = 20
+TCP 头 5 * 4 = 20 + 可选 12 字节（主要是默认开的时间戳10B）
+共66B</p>
+<h3 id="阶段一建立-tcp-连接" class="headerLink">
+    <a href="#%e9%98%b6%e6%ae%b5%e4%b8%80%e5%bb%ba%e7%ab%8b-tcp-%e8%bf%9e%e6%8e%a5" class="header-mark"></a>0.3 <strong>阶段一：建立 TCP 连接</strong></h3><h5 id="1-a-发起连接" class="headerLink">
+    <a href="#1-a-%e5%8f%91%e8%b5%b7%e8%bf%9e%e6%8e%a5" class="header-mark"></a>0.3.0.1 1. <strong>A 发起连接:</strong></h5><ul>
+<li>客户端 A 的操作系统向 Peer B 的 (IP_B, Port_B) <strong>发送一个 TCP SYN 包</strong>。</li>
+</ul>
+<h5 id="2-b-响应连接" class="headerLink">
+    <a href="#2-b-%e5%93%8d%e5%ba%94%e8%bf%9e%e6%8e%a5" class="header-mark"></a>0.3.0.2 2. <strong>B 响应连接:</strong></h5><ul>
+<li>Peer B 的操作系统接收到 SYN 包，如果端口正在监听且允许连接，则<strong>发送一个 TCP SYN-ACK 包</strong> 回给 A。</li>
+</ul>
+<h5 id="3-a-确认连接" class="headerLink">
+    <a href="#3-a-%e7%a1%ae%e8%ae%a4%e8%bf%9e%e6%8e%a5" class="header-mark"></a>0.3.0.3 3. <strong>A 确认连接:</strong></h5><ul>
+<li>客户端 A 的操作系统接收到 SYN-ACK 包，<strong>发送一个 TCP ACK 包</strong> 给 B。</li>
+<li><strong>结果:</strong> TCP 三次握手完成。A 和 B 之间建立了一条可靠的、面向连接的 TCP 通道。现在可以互相发送应用层数据了。
+<img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415204420.png'   alt="Pasted image 20250415204420.png"  ></li>
+</ul>
+<h3 id="阶段二bittorrent-标准握手-bep-3" class="headerLink">
+    <a href="#%e9%98%b6%e6%ae%b5%e4%ba%8cbittorrent-%e6%a0%87%e5%87%86%e6%8f%a1%e6%89%8b-bep-3" class="header-mark"></a>0.4 <strong>阶段二：BitTorrent 标准握手 (BEP-3)</strong></h3><h5 id="4-a-发送握手信息第106号" class="headerLink">
+    <a href="#4-a-%e5%8f%91%e9%80%81%e6%8f%a1%e6%89%8b%e4%bf%a1%e6%81%af%e7%ac%ac106%e5%8f%b7" class="header-mark"></a>0.4.0.4 4. <strong>A 发送握手信息（第106号）:</strong></h5><ul>
+<li>TCP 连接建立后，客户端 A <strong>立即</strong> 构造标准的 68 字节 BitTorrent 握手消息： <code>&lt;&quot;BitTorrent protocol&quot;&gt;&lt;8 reserved bytes&gt;&lt;info_hash&gt;&lt;peer_id_A&gt;</code></li>
+<li>其中 <code>reserved</code> 字节的<strong>第 5 字节的位 4</strong> 设置为 1，表示 A 支持 BEP-10 扩展协议如果双方都在这个位上设置为 <code>1</code>，它们就可以在标准握手之后立即交换扩展握手消息，从而协商使用如 <code>ut_metadata</code> (元数据交换), <code>ut_pex</code> (Peer Exchange) 等多种现代 BitTorrent 扩展功能。</li>
+<li>字节 7 (索引为 7), 位 3 (第 3 位)。掩码 (Mask) <code>0x04</code> (十六进制) 或 <code>00000100</code> (二进制)</li>
+<li>设置此位置表明该 Peer 支持 <strong>BEP-4 DHT Protocol (DHT 协议)</strong>。表明客户端<strong>理解并能够参与 DHT 网络</strong>。如果设置了此位，意味着该 Peer 可能运行一个 DHT 节点，并且（根据 BEP-4）理论上可以在与 BitTorrent P2P 流量相同的端口上响应 DHT 查询，不过我们KRPC监听端口和tcp端口不一样所以没有设置，设置此位是加入 Mainline DHT 网络的前提。</li>
+<li>A 将这 68 字节数据交给其 TCP 协议栈，<strong>发送 TCP 数据包</strong> 给 B。
+<img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415205800.png'   alt="Pasted image 20250415205800.png"  ></li>
+</ul>
+<h5 id="5-b-接收并验证握手信息" class="headerLink">
+    <a href="#5-b-%e6%8e%a5%e6%94%b6%e5%b9%b6%e9%aa%8c%e8%af%81%e6%8f%a1%e6%89%8b%e4%bf%a1%e6%81%af" class="header-mark"></a>0.4.0.5 5. <strong>B 接收并验证握手信息:</strong></h5><ul>
+<li>Peer B 的 TCP 协议栈 <strong>接收 TCP 数据包</strong>，并将数据递交给 BitTorrent 应用层。</li>
+<li>B 检查协议字符串是否为 &ldquo;BitTorrent protocol&rdquo;，检查 <code>info_hash</code> 是否是它关心的种子。假设匹配。</li>
+<li>B 记录下 A 的 <code>peer_id_A</code>。</li>
+<li>B 检查 A 发来的 <code>reserved</code> 字节，发现 A 支持 BEP-10。</li>
+</ul>
+<h5 id="6-b-发送握手信息108" class="headerLink">
+    <a href="#6-b-%e5%8f%91%e9%80%81%e6%8f%a1%e6%89%8b%e4%bf%a1%e6%81%af108" class="header-mark"></a>0.4.0.6 6. <strong>B 发送握手信息（108）:</strong></h5><ul>
+<li>Peer B 构造自己的 68 字节标准握手消息： <code>&lt;&quot;BitTorrent protocol&quot;&gt;&lt;8 reserved bytes&gt;&lt;info_hash&gt;&lt;peer_id_B&gt;</code> (B 也在 <code>reserved</code> 字节中表明自己支持 BEP-10)。</li>
+<li>B <strong>发送 TCP 数据包</strong> 给 A。
+<img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415210136.png'   alt="Pasted image 20250415210136.png"  ></li>
+</ul>
+<h5 id="7-a-接收并验证握手信息只读取68-可见108大小为333" class="headerLink">
+    <a href="#7-a-%e6%8e%a5%e6%94%b6%e5%b9%b6%e9%aa%8c%e8%af%81%e6%8f%a1%e6%89%8b%e4%bf%a1%e6%81%af%e5%8f%aa%e8%af%bb%e5%8f%9668-%e5%8f%af%e8%a7%81108%e5%a4%a7%e5%b0%8f%e4%b8%ba333" class="header-mark"></a>0.4.0.7 7. <strong>A 接收并验证握手信息（只读取68, 可见108大小为333）:</strong></h5><ul>
+<li>客户端 A 的 TCP 协议栈 <strong>接收 TCP 数据包</strong>。</li>
+<li>A 验证协议字符串和 <code>info_hash</code>。</li>
+<li>A 记录下 B 的 <code>peer_id_B</code>。</li>
+<li>A 检查 B 发来的 <code>reserved</code> 字节，确认 B 也支持 BEP-10。</li>
+<li><strong>结果:</strong> 标准握手完成。双方确认了对方身份和意图（针对同一个 <code>info_hash</code>），并且都知晓对方支持扩展协议。</li>
+<li>这里有点不一样的是，BT客户端的实现互不相同，有的会等A发送扩展握手后在回应，有的直接在握手包后面回复扩展握手了，这里注意一下，前面读取握手包只读取68字节，剩下的，扩展握手时候在处理，qbt就是这种。</li>
+</ul>
+<h3 id="阶段三扩展协议握手-bep-10---条件性" class="headerLink">
+    <a href="#%e9%98%b6%e6%ae%b5%e4%b8%89%e6%89%a9%e5%b1%95%e5%8d%8f%e8%ae%ae%e6%8f%a1%e6%89%8b-bep-10---%e6%9d%a1%e4%bb%b6%e6%80%a7" class="header-mark"></a>0.5 <strong>阶段三：扩展协议握手 (BEP-10) - 条件性</strong></h3><ul>
+<li>因为 A 和 B 都支持 BEP-10，所以此阶段会进行。_</li>
+</ul>
+<h5 id="8-a-发送扩展握手110" class="headerLink">
+    <a href="#8-a-%e5%8f%91%e9%80%81%e6%89%a9%e5%b1%95%e6%8f%a1%e6%89%8b110" class="header-mark"></a>0.5.0.8 8. <strong>A 发送扩展握手（110）:</strong></h5><ul>
+<li>扩展握手很简单，不过要注意ID, <strong>双方后续通信需要使用对方握手时候使用的ut_metadata ID 而且不能取0</strong></li>
+<li>客户端 A 构造 BEP-10 扩展握手消息 (消息 ID 固定为 <code>0</code>)： <code>&lt;长度前缀&gt;&lt;Bencoded 载荷&gt;</code> 载荷是一个 Bencode 字典，至少包含 <code>m</code> 字典，例如 <code>{&quot;m&quot;: {&quot;ut_metadata&quot;: 1}}</code> (表示 A 希望 B 在发送 <code>ut_metadata</code> 消息给 A 时使用 ID <code>1</code>)。可能还包含 <code>v</code> (版本), <code>metadata_size</code> (如果 A 碰巧有元数据的话，但在此场景下 A 没有，所以不含或为 0) 等。</li>
+<li>A <strong>发送 TCP 数据包</strong> 给 B。
+<img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415213230.png'   alt="Pasted image 20250415213230.png"  ></li>
+</ul>
+<h5 id="9-b-接收并处理扩展握手" class="headerLink">
+    <a href="#9-b-%e6%8e%a5%e6%94%b6%e5%b9%b6%e5%a4%84%e7%90%86%e6%89%a9%e5%b1%95%e6%8f%a1%e6%89%8b" class="header-mark"></a>0.5.0.9 9. <strong>B 接收并处理扩展握手:</strong></h5><ul>
+<li>Peer B <strong>接收 TCP 数据包</strong>。</li>
+<li>B 解析载荷，记录下 A 要求使用的扩展 ID 映射 (例如，知道发送 <code>ut_metadata</code> 给 A 要用 ID <code>1</code>)。记录 A 的版本等信息。</li>
+</ul>
+<h5 id="10-b-发送扩展握手" class="headerLink">
+    <a href="#10-b-%e5%8f%91%e9%80%81%e6%89%a9%e5%b1%95%e6%8f%a1%e6%89%8b" class="header-mark"></a>0.5.0.10 10. <strong>B 发送扩展握手:</strong></h5><ul>
+<li>Peer B 构造自己的 BEP-10 扩展握手消息 (消息 ID 固定为 <code>0</code>)： <code>&lt;长度前缀&gt;&lt;Bencoded 载荷&gt;</code> 载荷包含 B 的 <code>m</code> 字典，例如 <code>{&quot;m&quot;: {&quot;ut_metadata&quot;: 3}, &quot;metadata_size&quot;: 9308}</code> (表示 B 希望 A 在发送 <code>ut_metadata</code> 给 B 时使用 ID <code>3</code>，并且 B 宣告它拥有的元数据大小为 12345 字节)。</li>
+<li>B <strong>发送 TCP 数据包</strong> 给 A。</li>
+</ul>
+<ol start="11">
+<li><strong>A 接收并处理扩展握手(108后半部分）:</strong>
+<img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415210405.png'   alt="Pasted image 20250415210405.png"  >
+<ul>
+<li>客户端 A <strong>接收 TCP 数据包</strong>。</li>
+<li>A 解析载荷，记录下 B 要求使用的扩展 ID 映射 (知道发送 <code>ut_metadata</code> 给 B 要用 ID <code>2</code>)。</li>
+<li>A 从 B 的握手消息中获知了元数据的确切大小 (<code>metadata_size: 9308</code>)。</li>
+<li>扩展协议握手完成。双方知道了如何互相发送扩展消息（特别是 <code>ut_metadata</code>），并且 A 知道了元数据的总大小。</li>
+<li>解释一下其余字段，ut_pex 是节点交换协议标识位，reqq是说明piece分片请求中，由于可以流水线处理，最大支持的处理数，v 可选是版本， your ip 是对方看到的IP</li>
+</ul>
+</li>
+</ol>
+<h3 id="阶段四元数据交换-" class="headerLink">
+    <a href="#%e9%98%b6%e6%ae%b5%e5%9b%9b%e5%85%83%e6%95%b0%e6%8d%ae%e4%ba%a4%e6%8d%a2-" class="header-mark"></a>0.6 <strong>阶段四：元数据交换 (<code>ut_metadata</code>, BEP-9) - 条件性</strong></h3><ul>
+<li>因为 A 需要元数据，且 B 支持 <code>ut_metadata</code> 并拥有元数据，所以此阶段会进行。A 知道需要向 B 发送 ID 为 <code>3</code> 的消息来请求元数据。_</li>
+</ul>
+<h5 id="12-a-请求元数据块1002" class="headerLink">
+    <a href="#12-a-%e8%af%b7%e6%b1%82%e5%85%83%e6%95%b0%e6%8d%ae%e5%9d%971002" class="header-mark"></a>0.6.0.11 12. <strong>A 请求元数据块（1002）:</strong></h5><ul>
+<li>
+<p>客户端 A 根据获知的 <code>metadata_size</code> (9308 字节) 和标准块大小 (16 KB = 16384 字节)，计算出需要请求多少个元数据块 (我们这个就1快儿)。假设元数据大小是 30000 字节，则需要请求块 0 和块 1。</p>
+</li>
+<li>
+<p>A 开始请求<strong>第一个</strong>元数据块 (索引 <code>0</code>)：</p>
+<ul>
+<li>
+<p>构造 <code>ut_metadata</code> 请求载荷 (Bencode 字典): <code>{&quot;msg_type&quot;: 0, &quot;piece&quot;: 0}</code></p>
+</li>
+<li>
+<p>构造 BEP-10 消息: <code>&lt;长度前缀&gt;&lt;上述 Bencoded 载荷&gt;</code> (注意消息 ID 是 <code>3</code>)</p>
+</li>
+<li>
+<p>A <strong>发送 TCP 数据包</strong> 给 B。</p>
+</li>
+<li>
+<p>(如果需要更多块，A 可以连续发送对块 1, 2&hellip; 的请求，不必等待响应，这称为流水线 Pipelining)。
+<img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415213501.png'   alt="Pasted image 20250415213501.png"  ></p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="13-b-接收请求并发送数据块" class="headerLink">
+    <a href="#13-b-%e6%8e%a5%e6%94%b6%e8%af%b7%e6%b1%82%e5%b9%b6%e5%8f%91%e9%80%81%e6%95%b0%e6%8d%ae%e5%9d%97" class="header-mark"></a>0.6.0.12 13. <strong>B 接收请求并发送数据块:</strong></h5><ul>
+<li>Peer B <strong>接收 TCP 数据包</strong>。</li>
+<li>B 解析消息，识别出是 ID 为 <code>2</code> (对应 <code>ut_metadata</code>) 的消息，再解析内部载荷，看到是 <code>msg_type: 0</code> (请求)，请求的是 <code>piece: 0</code>。</li>
+<li>B 获取元数据的第 0 块数据（从字节 0 到 16383，但在此例中只有 9308 字节）。</li>
+<li>B 构造 <code>ut_metadata</code> 数据载荷 (Bencode 字典 + 原始数据): <code>{&quot;msg_type&quot;: 1, &quot;piece&quot;: 0, &quot;total_size&quot;: 9308}</code> 后紧跟 9308 字节的元数据块。</li>
+<li>B 构造 BEP-10 消息: <code>&lt;长度前缀&gt;&lt;上述 Bencode 载荷 + 原始数据块&gt;</code> (注意消息 ID 是 <code>1</code>，这是 A 在握手中指定的 B-&gt;A 的 <code>ut_metadata</code> ID)。</li>
+<li>B <strong>发送 TCP 数据包</strong> 给 A。</li>
+<li>如下图显然我们这里tcp分包了，然后在119重组
+<img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415213718.png'   alt="Pasted image 20250415213718.png"  ></li>
+</ul>
+<h5 id="14-a-接收并存储数据块" class="headerLink">
+    <a href="#14-a-%e6%8e%a5%e6%94%b6%e5%b9%b6%e5%ad%98%e5%82%a8%e6%95%b0%e6%8d%ae%e5%9d%97" class="header-mark"></a>0.6.0.13 14. <strong>A 接收并存储数据块:</strong></h5><ul>
+<li>客户端 A <strong>接收 TCP 数据包</strong>。</li>
+<li>A 解析消息，识别出是 ID 为 <code>1</code> (对应 <code>ut_metadata</code>)，解析内部载荷看到是 <code>msg_type: 1</code> (数据)，对应 <code>piece: 0</code>，总大小 <code>total_size: 9308</code>。</li>
+<li>A 读取随后的 9308 字节原始数据。</li>
+<li>A 将这块数据存储在内存中，作为元数据的第 0 块。</li>
+</ul>
+<h5 id="15-a-请求并接收后续块-如果需要" class="headerLink">
+    <a href="#15-a-%e8%af%b7%e6%b1%82%e5%b9%b6%e6%8e%a5%e6%94%b6%e5%90%8e%e7%bb%ad%e5%9d%97-%e5%a6%82%e6%9e%9c%e9%9c%80%e8%a6%81" class="header-mark"></a>0.6.0.14 15. <strong>A 请求并接收后续块 (如果需要):</strong></h5><ul>
+<li>如果元数据大于 16 KiB，A 会继续发送对后续块 (<code>piece: 1</code>, <code>piece: 2</code>&hellip;) 的请求，B 也会类似地响应数据块。A 持续接收并组装。</li>
+</ul>
+<h5 id="16-a-完成接收并校验" class="headerLink">
+    <a href="#16-a-%e5%ae%8c%e6%88%90%e6%8e%a5%e6%94%b6%e5%b9%b6%e6%a0%a1%e9%aa%8c" class="header-mark"></a>0.6.0.15 16. <strong>A 完成接收并校验:</strong></h5><ul>
+<li>
+<p>当 A 接收完所有预期的块（根据 <code>total_size</code> 判断）后，它将所有块按顺序拼接起来，得到完整的 Bencode 编码的 <code>info</code> 字典数据。</p>
+</li>
+<li>
+<p>A 计算这段完整数据的 SHA-1 哈希值。</p>
+</li>
+<li>
+<p>A 将计算出的哈希与它最初从 Magnet 链接得到的 <code>info_hash</code> 进行比较。</p>
+</li>
+<li>
+<p><strong>结果:</strong></p>
+</li>
+<li>
+<p><strong>匹配:</strong> A 成功获取并验证了元数据！现在它可以解析这个 <code>info</code> 字典，了解文件结构、大小、分块哈希等，并开始请求实际的文件数据块。</p>
+</li>
+<li>
+<p><strong>不匹配:</strong> 获取元数据失败，A 可能会丢弃数据并尝试从其他 Peer 获取。</p>
+<p><img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415213910.png'   alt="Pasted image 20250415213910.png"  >
+大功告成了</p>
+</li>
+</ul>
+<h5 id="17-手动关闭了连接" class="headerLink">
+    <a href="#17-%e6%89%8b%e5%8a%a8%e5%85%b3%e9%97%ad%e4%ba%86%e8%bf%9e%e6%8e%a5" class="header-mark"></a>0.6.0.16 17. <strong>手动关闭了连接</strong></h5><p>实际连接可能不会这么快关闭，毕竟还要传输数据
+<img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415214713.png'   alt="Pasted image 20250415214713.png"  ></p>
+<h3 id="其他" class="headerLink">
+    <a href="#%e5%85%b6%e4%bb%96" class="header-mark"></a>0.7 <strong>其他</strong></h3><p>实际下载中，会有些其他和拓展协议并列的消息，需要注意过滤掉，比如MsgTypeExt: 5的bitfield,用于表示B已经下载的分块。
+<img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415215132.png'   alt="Pasted image 20250415215132.png"  >
+<img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415215009.png'   alt="Pasted image 20250415215009.png"  >
+还有就是，可见我们连续发送了多个分片元数据请求，这个请求后B开始发送元数据到A,注意超时时间不要设置的太短，如果网络情况差，可能不会很快。</p>
+<p><img class="tw-inline" loading="lazy" src='Pasted%20image%2020250415220312.png'   alt="Pasted image 20250415220312.png"  ></p>
+</div>
+
+        
+
+
+
+<h3>相关内容</h3>
+<div>
+    <a href="/krpc%E8%AF%B7%E6%B1%82%E6%A0%BC%E5%BC%8F/">KRPC请求格式</a>  <br/>
+        
+    <a href="/kprc/">KRPC</a>  <br/>
+        
+    <a href="/kademlia-%E7%AE%97%E6%B3%95-2/">Kademlia 算法（二）</a>  <br/>
+        
+    <a href="/kademlia-%E7%AE%97%E6%B3%95-1/">Kademlia 算法（一）</a>  <br/>
+        
+    <a href="/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/">BitTorrent  的 DHT协议</a>  <br/>
+        
+    
+
+</div>
+
+
+<div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2025-04-19</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line print:!tw-hidden">
+            <div class="post-info-md"><span><a class="link-to-mardown" href=/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/index.md target="_blank" rel="noopener noreferrer">阅读原始文档</a>
+                    </span><span>|&nbsp;<a class="link-to-source" href=https://github.com/sirius-fan/sirius-fan.github.io/tree/main/content/posts/BT/BT握手与TCP的连接与释放/index.zh-cn.md target="_blank" rel="noopener noreferrer">查看源代码</a>
+                    </span><span>|&nbsp;<a class="link-to-report" href=https://github.com/sirius-fan/sirius-fan.github.io/issues/new?title=[bug]%20BT%E6%8F%A1%E6%89%8B%E4%B8%8ETCP%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE&body=|Field|Value|%0A|-|-|%0A|Title|BT%E6%8F%A1%E6%89%8B%E4%B8%8ETCP%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE|%0A|Url|https://hugodoit.pages.dev/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/|%0A|Filename|https://github.com/HEIGE-PCloud/DoIt/blob/main/exampleSite/content/posts/BT/BT握手与TCP的连接与释放/index.zh-cn.md| target="_blank" rel="noopener noreferrer">报告问题</a>
+                    </span></div>
+            <div class="post-info-share"><button title="分享到 微博" data-sharer="weibo" data-url="https://hugodoit.pages.dev/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/" data-title="BT握手与TCP的连接与释放"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M407 177.6c7.6-24-13.4-46.8-37.4-41.7-22 4.8-28.8-28.1-7.1-32.8 50.1-10.9 92.3 37.1 76.5 84.8-6.8 21.2-38.8 10.8-32-10.3zM214.8 446.7C108.5 446.7 0 395.3 0 310.4c0-44.3 28-95.4 76.3-143.7C176 67 279.5 65.8 249.9 161c-4 13.1 12.3 5.7 12.3 6 79.5-33.6 140.5-16.8 114 51.4-3.7 9.4 1.1 10.9 8.3 13.1 135.7 42.3 34.8 215.2-169.7 215.2zm143.7-146.3c-5.4-55.7-78.5-94-163.4-85.7-84.8 8.6-148.8 60.3-143.4 116s78.5 94 163.4 85.7c84.8-8.6 148.8-60.3 143.4-116zM347.9 35.1c-25.9 5.6-16.8 43.7 8.3 38.3 72.3-15.2 134.8 52.8 111.7 124-7.4 24.2 29.1 37 37.4 12 31.9-99.8-55.1-195.9-157.4-174.3zm-78.5 311c-17.1 38.8-66.8 60-109.1 46.3-40.8-13.1-58-53.4-40.3-89.7 17.7-35.4 63.1-55.4 103.4-45.1 42 10.8 63.1 50.2 46 88.5zm-86.3-30c-12.9-5.4-30 .3-38 12.9-8.3 12.9-4.3 28 8.6 34 13.1 6 30.8.3 39.1-12.9 8-13.1 3.7-28.3-9.7-34zm32.6-13.4c-5.1-1.7-11.4.6-14.3 5.4-2.9 5.1-1.4 10.6 3.7 12.9 5.1 2 11.7-.3 14.6-5.4 2.8-5.2 1.1-10.9-4-12.9z"/></svg></button><button title="分享到 Telegram" data-sharer="telegram" data-url="https://hugodoit.pages.dev/bt%E6%8F%A1%E6%89%8B%E4%B8%8Etcp%E7%9A%84%E8%BF%9E%E6%8E%A5%E4%B8%8E%E9%87%8A%E6%94%BE/" data-title="BT握手与TCP的连接与释放" data-web><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M446.7 98.6l-67.6 318.8c-5.1 22.5-18.4 28.1-37.3 17.5l-103-75.9-49.7 47.8c-5.5 5.5-10.1 10.1-20.7 10.1l7.4-104.9 190.9-172.5c8.3-7.4-1.8-11.5-12.9-4.1L117.8 284 16.2 252.2c-22.1-6.9-22.5-22.1 4.6-32.7L418.2 66.4c18.4-6.9 34.5 4.1 28.5 32.2z"/></svg></button></div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg>&nbsp;<a href="/tags/bt/">BT</a></section>
+        <section class="print:!tw-hidden">
+            <span><button class="tw-text-fgColor-link-muted hover:tw-text-fgColor-link-muted-hover" onclick="window.history.back();">返回</button></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav print:tw-hidden"><a href="/obsidian-%E7%94%9F%E6%88%90-frontmatter/" class="prev" rel="prev" title="obsidian 生成 Frontmatter"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M31.7 239l136-136c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9L127.9 256l96.4 96.4c9.4 9.4 9.4 24.6 0 33.9L201.7 409c-9.4 9.4-24.6 9.4-33.9 0l-136-136c-9.5-9.4-9.5-24.6-.1-34z"/></svg>obsidian 生成 Frontmatter</a>
+            <a href="/bittorrent-%E7%9A%84-dht%E5%8D%8F%E8%AE%AE/" class="next" rel="next" title="BitTorrent  的 DHT协议">BitTorrent  的 DHT协议<svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg></a></div>
+</div>
+</article></main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">
+                    由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.148.1">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.4.2"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M402.3 344.9l32-32c5-5 13.7-1.5 13.7 5.7V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h273.5c7.1 0 10.7 8.6 5.7 13.7l-32 32c-1.5 1.5-3.5 2.3-5.7 2.3H48v352h352V350.5c0-2.1.8-4.1 2.3-5.6zm156.6-201.8L296.3 405.7l-90.4 10c-26.2 2.9-48.5-19.2-45.6-45.6l10-90.4L432.9 17.1c22.9-22.9 59.9-22.9 82.7 0l43.2 43.2c22.9 22.9 22.9 60 .1 82.8zM460.1 174L402 115.9 216.2 301.8l-7.3 65.3 65.3-7.3L460.1 174zm64.8-79.7l-43.2-43.2c-4.1-4.1-10.8-4.1-14.8 0L436 82l58.1 58.1 30.9-30.9c4-4.2 4-10.8-.1-14.9z"/></svg> DoIt</a>
+                </div><div class="footer-line"><svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 448c-110.532 0-200-89.451-200-200 0-110.531 89.451-200 200-200 110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200zm107.351-101.064c-9.614 9.712-45.53 41.396-104.065 41.396-82.43 0-140.484-61.425-140.484-141.567 0-79.152 60.275-139.401 139.762-139.401 55.531 0 88.738 26.62 97.593 34.779a11.965 11.965 0 0 1 1.936 15.322l-18.155 28.113c-3.841 5.95-11.966 7.282-17.499 2.921-8.595-6.776-31.814-22.538-61.708-22.538-48.303 0-77.916 35.33-77.916 80.082 0 41.589 26.888 83.692 78.277 83.692 32.657 0 56.843-19.039 65.726-27.225 5.27-4.857 13.596-4.039 17.82 1.738l19.865 27.17a11.947 11.947 0 0 1-1.152 15.518z"/></svg>2019 - 2025<span class="author">&nbsp;<a href="https://github.com/sirius-fan" target="_blank" rel="noopener noreferrer">Fan</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+            <div class="footer-line"></div>
+            <div class="footer-line">
+            </div>
+        </div><script>
+                    if('serviceWorker' in navigator) {
+                        navigator.serviceWorker
+                            .register('/sw.min.js', { scope: '/' })
+                            .then(function(registration) {
+                            });
+                
+                        navigator.serviceWorker
+                            .ready
+                            .then(function(registration) {
+                            });
+                    }
+                </script></footer><div class="print:!tw-hidden tw-flex tw-flex-col tw-fixed tw-right-4 tw-bottom-4 tw-gap-2"><a href="#back-to-top" id="back-to-top-button" class="tw-transition-opacity tw-opacity-0 tw-block tw-bg-bgColor-secondary tw-rounded-full" style="padding: 0.6rem; line-height: 1.3rem; font-size: 1rem;" title="回到顶部">
+      <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg>
+  </a>
+
+  <button id="toc-drawer-button" class="tw-block tw-bg-bgColor-secondary tw-rounded-full md:tw-hidden" style="padding: 0.6rem; line-height: 1.3rem; font-size: 1rem;">
+      <svg class="icon"
+    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"/></svg>
+  </button></div>
+
+<script>window.config={"autocomplete.min.js":"/lib/autocomplete/autocomplete.min.js","comment":{},"data":{"desktop-header-typeit":"Sirius","mobile-header-typeit":"Sirius"},"fuse.min.js":"/lib/fuse/fuse.min.js","search":{"distance":100,"findAllMatches":false,"fuseIndexURL":"/index.json","highlightTag":"em","ignoreFieldNorm":false,"ignoreLocation":true,"isCaseSensitive":false,"location":0,"maxResultLength":10,"minMatchCharLength":2,"noResultsFound":"没有找到结果","snippetLength":50,"threshold":0.1,"type":"fuse","useExtendedSearch":false},"sharerjs":true,"table":{"sort":true},"typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"desktop-header-typeit":["desktop-header-typeit"],"mobile-header-typeit":["mobile-header-typeit"]},"duration":-1,"speed":100}};</script><script
+    src="/lib/tablesort/tablesort.min.js"
+    
+  ></script><script
+    src="/lib/sharer/sharer.min.js"
+    
+  ></script><script
+    src="/lib/typeit/typeit.min.js"
+    
+  ></script><script
+    src="/js/theme.min.js"
+    
+      defer
+    
+  ></script>
+
+<script type="speculationrules">
+  {
+    "prerender": [
+      {
+        "where": { "href_matches": "/*" },
+        "eagerness": "moderate"
+      }
+    ]
+  }
+</script>
+</body>
+
+</html>

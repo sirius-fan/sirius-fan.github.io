@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>数据库 on Fan的博客</title>
+    <link>https://hugodoit.pages.dev/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/</link>
+    <description>Recent content in 数据库 on Fan的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-CN</language>
+    <managingEditor>fan097@outlook.com (Fan)</managingEditor>
+    <webMaster>fan097@outlook.com (Fan)</webMaster>
+    <lastBuildDate>Mon, 23 Jun 2025 16:56:43 +0800</lastBuildDate>
+    <atom:link href="https://hugodoit.pages.dev/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MySQL学习笔记</title>
+      <link>https://hugodoit.pages.dev/mysql%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+      <pubDate>Thu, 24 Apr 2025 15:34:14 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/mysql%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
+      <description>&lt;p&gt;{% blockquote 黑马程序员  &#xA;&lt;a href=&#34;https://www.bilibili.com/video/BV1Kr4y1i7ru/?share_source=copy_web&amp;amp;vd_source=e43c1de8e41e1499f7f3fdb03fba0eb6&#34;&gt;https://www.bilibili.com/video/BV1Kr4y1i7ru/?share_source=copy_web&amp;vd_source=e43c1de8e41e1499f7f3fdb03fba0eb6&lt;/a&gt; 黑马程序员 MySQL数据库入门到精通，从mysql安装到mysql高级、mysql优化全囊括 %}&#xA;{% endblockquote %}&lt;/p&gt;&#xA;&lt;!-- more --&gt;&#xA;&lt;p&gt;在此非常感谢两位热爱学习的小伙伴的鼎力相助，帮助我们完成了所有的章节内容，使得本篇超长笔记得以完结。至此，整个MySQL笔记从入门到高级的所有内容都已编写完毕。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

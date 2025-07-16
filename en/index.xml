@@ -1,0 +1,10 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Fan的博客</title>
+        <link>https://hugodoit.pages.dev/en/</link>
+        <description>The official documentation for the Hugo DoIt theme</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>fan097@outlook.com (Fan)</managingEditor>
+            <webMaster>fan097@outlook.com (Fan)</webMaster><lastBuildDate>Fri, 02 Aug 2019 11:04:49 &#43;0800</lastBuildDate>
+            <atom:link href="https://hugodoit.pages.dev/en/index.xml" rel="self" type="application/rss+xml" />
+        </channel>
+</rss>

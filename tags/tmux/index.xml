@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tmux on Fan的博客</title>
+    <link>https://hugodoit.pages.dev/tags/tmux/</link>
+    <description>Recent content in Tmux on Fan的博客</description>
+    <generator>Hugo</generator>
+    <language>zh-CN</language>
+    <managingEditor>fan097@outlook.com (Fan)</managingEditor>
+    <webMaster>fan097@outlook.com (Fan)</webMaster>
+    <lastBuildDate>Sun, 04 Feb 2024 04:36:28 +0800</lastBuildDate>
+    <atom:link href="https://hugodoit.pages.dev/tags/tmux/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>tmux小技巧</title>
+      <link>https://hugodoit.pages.dev/tmux%E5%B0%8F%E6%8A%80%E5%B7%A7/</link>
+      <pubDate>Sun, 04 Feb 2024 04:36:28 +0800</pubDate><author>fan097@outlook.com (Fan)</author>
+      <guid>https://hugodoit.pages.dev/tmux%E5%B0%8F%E6%8A%80%E5%B7%A7/</guid>
+      <description>&lt;h2 id=&#34;常用操作&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#%e5%b8%b8%e7%94%a8%e6%93%8d%e4%bd%9c&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;5 常用操作&lt;/h2&gt;&lt;h3 id=&#34;tmux会话操作&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#tmux%e4%bc%9a%e8%af%9d%e6%93%8d%e4%bd%9c&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;5.1 tmux会话操作&lt;/h3&gt;&lt;ul&gt;&#xA;&lt;li&gt;创建会话 &lt;code&gt;tmux new -t  &amp;lt;session_name&amp;gt;&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;退出会话 &lt;code&gt;Ctrl + B&lt;/code&gt;然后按下&lt;code&gt;D&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;回到会话&lt;code&gt;tmux attach&lt;/code&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;tmux窗口操作&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#tmux%e7%aa%97%e5%8f%a3%e6%93%8d%e4%bd%9c&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;5.2 tmux窗口操作&lt;/h3&gt;&lt;ul&gt;&#xA;&lt;li&gt;创建窗口 &lt;code&gt;Ctrl + B&lt;/code&gt; 然后按下&lt;code&gt;C&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;窗口列表 &lt;code&gt;Ctrl + B&lt;/code&gt;, &lt;code&gt;W&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;切换下一个窗口 &lt;code&gt;Ctrl + B&lt;/code&gt;, 然后按下&lt;code&gt;N&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;切换上一个窗口 &lt;code&gt;Ctrl + B&lt;/code&gt;, 然后按下&lt;code&gt;P&lt;/code&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;tmux-面板操作&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#tmux-%e9%9d%a2%e6%9d%bf%e6%93%8d%e4%bd%9c&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;5.3 tmux 面板操作&lt;/h3&gt;&lt;ul&gt;&#xA;&lt;li&gt;垂直分割 &lt;code&gt;Ctrl + B&lt;/code&gt;, &lt;code&gt;%&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;水平分割 &lt;code&gt;Ctrl + B&lt;/code&gt;, &lt;code&gt;&amp;quot;&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;切换布局 &lt;code&gt;Ctrl + B&lt;/code&gt;, &lt;code&gt;&amp;lt;space&amp;gt;&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;调整窗口大小 &lt;code&gt;Ctrl + B&lt;/code&gt; 按住不松手同时按下 &lt;code&gt;&amp;lt;上|下|左|右&amp;gt;&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;关掉面板 &lt;code&gt;Ctrl + B&lt;/code&gt;, &lt;code&gt;X&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;当前面板全屏 &lt;code&gt;Ctrl + B&lt;/code&gt;, &lt;code&gt;Z&lt;/code&gt;, 再次使用&lt;code&gt;Ctrl + B&lt;/code&gt;, &lt;code&gt;Z&lt;/code&gt; 则退出全屏模式&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;tmux滚动-ctrl--b-&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#tmux%e6%bb%9a%e5%8a%a8-ctrl--b-&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;5.4 tmux滚动 &lt;code&gt;Ctrl + B&lt;/code&gt;, &lt;code&gt;[&lt;/code&gt;&lt;/h3&gt;&lt;h2 id=&#34;配置文件&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#%e9%85%8d%e7%bd%ae%e6%96%87%e4%bb%b6&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;6 配置文件&lt;/h2&gt;&lt;h3 id=&#34;tmux复制粘贴&#34; class=&#34;headerLink&#34;&gt;&#xA;    &lt;a href=&#34;#tmux%e5%a4%8d%e5%88%b6%e7%b2%98%e8%b4%b4&#34; class=&#34;header-mark&#34;&gt;&lt;/a&gt;6.1 tmux复制粘贴&lt;/h3&gt;&lt;p&gt;如果要复制粘贴，则把要复制的那个窗口调整成全屏模式&lt;code&gt;Ctrl + B + Z&lt;/code&gt; 然后复制，接着退出全屏模式即可。后面的可以不用看了，改配置是最麻烦且容易出错的。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
